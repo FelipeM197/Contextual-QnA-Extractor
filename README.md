@@ -1,33 +1,20 @@
-# RAG Multi-Agent
-
-Sistema RAG multi-agente con LangGraph, Raghilda, DuckDB y Ollama. Convierte documentos a Markdown, recupera contexto, genera preguntas, responde con evidencia y exporta un cuestionario.
+# Sistema RAG modular
 
 ## Estructura
 
-- `notebooks/RAG.ipynb`: flujo principal ejecutable.
-- `data/input/`: documentos fuente.
-- `data/processed/`: Markdown convertido.
-- `data/vectorstore/`: bases DuckDB generadas.
-- `outputs/`: cuestionarios exportados.
-- `docs/GUIA_USO.md`: guía completa de uso.
-- `docs/Plan.md`: plan de implementación.
-- `requeriments.txt`: dependencias Python fijadas.
+- `inputs/`: documentos originales que se procesan.
+- `prompts/`: instrucciones Markdown para preguntas y respuestas.
+- `python/`: configuracion, ingesta, herramientas RAG, agentes, grafo y entrada principal.
+- `outputs/`: Markdown convertido, base DuckDB y cuestionario final.
+- `RAG.ipynb`: version interactiva y documentacion del flujo.
 
-## Inicio rápido
+## Ejecucion
 
-Desde la raíz del proyecto:
+Desde la raiz del proyecto:
 
-```powershell
-.\.venv\Scripts\Activate.ps1
+```bash
+conda activate QAG_System
+python -m python.main
 ```
 
-Abre `notebooks/RAG.ipynb`, selecciona el kernel `.venv (Python 3.11.9)` y ejecuta las celdas en orden.
-
-Para habilitar el modelo local, configura Ollama con almacenamiento en `D:` antes de iniciarlo:
-
-```powershell
-$env:OLLAMA_MODELS="D:\Ollama_Modelos"
-ollama serve
-```
-
-Consulta [docs/GUIA_USO.md](docs/GUIA_USO.md) para cambiar documentos, reconstruir el entorno y revisar los resultados.
+El PDF de entrada esperado es `inputs/Manchester United Profile.pdf`. Los parametros principales se encuentran en `python/config.py`.
