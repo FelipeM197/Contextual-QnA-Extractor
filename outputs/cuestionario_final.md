@@ -1,30 +1,31 @@
-**Cuestionario para estudiantes universitarios**
-=============================================
+# Cuestionario adaptado para estudiante universitario
 
-**Preguntas y respuestas**
--------------------------
+## 1. ¿Cuál es el objetivo principal de la implementación de un Grafo Dirigido Acíclico (DAG) para automatizar la validación de prerrequisitos en una malla curricular universitaria?
 
-### 1. ¿Qué herramienta se utilizó para la elaboración del informe?
+El objetivo principal de la implementación de un Grafo Dirigido Acíclico (DAG) es automatizar la validación de prerrequisitos en una malla curricular universitaria, permitiendo a los estudiantes encontrar rutas viables de estudio mediante algoritmos de búsqueda.
 
-* **Respuesta:** La herramienta utilizada para la elaboración del informe fue Gemini (versión Pro 3.1).
-* **Fuente:** CHUNK 1
+Fuente: CHUNK 1
 
-### 2. ¿Qué propósito se le dio a la herramienta Gemini 3.1 Pro en la elaboración del informe?
+## 2. ¿Cuál es el tipo de dato abstracto (ADT) utilizado en la implementación y qué paradigma de programación se emplea?
 
-* **Respuesta:** La herramienta Gemini 3.1 Pro se utilizó para la validación de documentación, específicamente para "Validar que mi informe sea completo según la rúbrica". La herramienta señaló como faltantes ciertas secciones y tablas, que luego se agregaron para asegurar el cumplimiento estricto de la rúbrica.
-* **Fuente:** CHUNK 2
+El Tipo de Dato Abstracto (ADT) utilizado en la implementación es el Grafo Dirigido Acíclico (DAG), y se emplea el paradigma de Programación Orientada a Objetos (POO).
 
-### 3. ¿Qué tipo de asistencia pedagógica se solicitó a la herramienta Gemini 3.1 Pro en la elaboración del informe?
+Fuente: CHUNK 1
 
-* **Respuesta:** La asistencia pedagógica solicitada a la herramienta Gemini 3.1 Pro en la elaboración del informe fue para la corrección ortográfica y gramatical del texto, así como para la revisión y mejora de la redacción.
-* **Fuente:** CHUNK 1
+## 3. ¿Cuál es el algoritmo utilizado para trazar rutas óptimas y qué ventajas tiene sobre otros algoritmos?
 
-### 4. ¿Qué tipo de ajustes se solicitaron a la herramienta Gemini 3.1 Pro en la elaboración del informe?
+El algoritmo utilizado para trazar rutas óptimas es el BFS (Breadth-First Search). Esta herramienta probó ser indispensable para trazar rutas óptimas empleando colas, mientras que DFS resultó valioso para recorrer ramas completas de prerrequisitos de manera exhaustiva utilizando pilas.
 
-* **Respuesta:** Según el contexto, se solicitaron ajustes de visualización a la herramienta Gemini 3.1 Pro, específicamente para que tenga características visuales en un script de generación de grafo.
-* **Fuente:** CHUNK 2
+Fuente: CHUNK 2
 
-### 5. ¿Qué tipo de conversión se solicitó a la herramienta Gemini 3.1 Pro en la elaboración del informe?
+## 4. ¿Cómo se implementan las validaciones de frontera en el sistema y qué beneficios aporta?
 
-* **Respuesta:** La herramienta Gemini 3.1 Pro se solicitó para la conversión de estructura de datos, específicamente para convertir un documento a un archivo JSON. El prompt proporcionado fue: "Del siguiente documento... conviértelos a un archivo json".
-* **Fuente:** CHUNK 2
+El sistema demostró robustez al implementar validaciones de frontera, logrando detectar de manera determinista los grafos desconectados (cuando se intenta ir a una materia de otra rama que no se conecta con otra), manteniendo un sistema consistente ante el diseño real de la malla curricular de la carrera.
+
+Fuente: CHUNK 3
+
+## 5. ¿Qué herramienta se utiliza para la revisión y mejora de la redacción del informe y qué propósitos se le asignan?
+
+La herramienta utilizada para la revisión y mejora de la redacción del informe es Gemini 3.1 Pro. Se le asignan propósitos como "Mejora la redacción de este punto" y "Revisa la ortografía y gramática de este texto y sugiere correcciones".
+
+Fuente: CHUNK 1
