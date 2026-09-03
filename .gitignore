@@ -1,0 +1,41 @@
+# =========================
+# Entornos Virtuales
+# =========================
+.venv
+.venv-1
+.venv-2
+env/
+venv/
+
+# =========================
+# Caché y Archivos de Python
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.ipynb_checkpoints/
+
+# =========================
+# Bases de Datos y RAG
+# =========================
+# Ignora las bases de datos de DuckDB
+*.db
+*.db.wal
+# Ignora la carpeta donde guardas la base vectorial
+data/vectorstore/
+
+# =========================
+# Modelos IA y Caché de Hugging Face
+# =========================
+huggingface_cache/
+Ollama_Modelos/
+
+# =========================
+# Datos y Resultados (Opcional)
+# =========================
+# Si no quieres subir los PDFs originales ni los resultados generados:
+# data/input/
+# outputs/
+# *.pdf
