@@ -80,10 +80,10 @@ def node_critic(state: QAState) -> dict:
     questions = state.get("candidate_questions", [])
     context = state["cleaned_text"].lower()
 
-    if not questions:
+    if not questions or len(questions) < 5:
         return {
             "critic_approved": False,
-            "critic_notes": "El modelo no generó una lista de preguntas válida en JSON."
+            "critic_notes": f"Se requieren exactamente 5 preguntas en JSON (se recibieron {len(questions)})."
         }
 
     hallucinations = 0
@@ -95,7 +95,7 @@ def node_critic(state: QAState) -> dict:
     if hallucinations == 0:
         return {
             "critic_approved": True,
-            "critic_notes": "Aprobado: todas las respuestas están ancladas en el texto."
+            "critic_notes": "Aprobado: las 5 preguntas y sus respuestas están ancladas en el texto."
         }
     else:
         return {

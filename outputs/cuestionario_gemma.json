@@ -1,50 +1,62 @@
 [
   {
     "id": 1,
-    "question": "¿Qué transforma el dióxido de carbono y el agua en glucosa y oxígeno?",
+    "question": "¿Cuál es el proceso bioquímico de las plantas y algas?",
     "options": [
-      "Las algas",
-      "El cloroplasto",
-      "La acción del pigmento verde",
-      "La fotosíntesis"
+      "Transformación del agua",
+      "Fotosíntesis",
+      "Producción de oxígeno",
+      "Conversión de luz solar"
     ],
-    "correct_answer": "La fotosíntesis",
-    "explanation": "La fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable."
+    "correct_answer": "Fotosíntesis",
+    "explanation": "La fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar."
   },
   {
     "id": 2,
-    "question": "¿Cuál es el papel del agua en la transformación de dióxido de carbono?",
+    "question": "¿Qué elementos se convierten en glucosa y oxígeno durante este fenómeno?",
     "options": [
-      "Se convierte en oxígeno",
-      "Se transforma en glucosa",
-      "Se convierte en agua molecular",
-      "Se convierte en clorofila"
+      "Dióxido de carbono y clorofila",
+      "Agua y dióxido de carbono",
+      "Dióxido de carbono y agua",
+      "Luz solar y energía química"
     ],
-    "correct_answer": "Se transforma en glucosa",
-    "explanation": "Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos."
+    "correct_answer": "Dióxido de carbono y agua",
+    "explanation": "Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular."
   },
   {
     "id": 3,
-    "question": "¿Qué tipo de energía es transformada durante la fotosíntesis?",
+    "question": "¿Qué acción permite la transformación de energía solar?",
     "options": [
-      "Energía química estable",
-      "Energía del agua",
-      "Energía de la luz solar",
-      "Energía molecular"
+      "Acción del pigmento verde",
+      "Acción del clorofila",
+      "Acción del dióxido de carbono",
+      "Acción del agua"
     ],
-    "correct_answer": "Energía de la luz solar",
-    "explanation": "La fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable."
+    "correct_answer": "Acción del clorofila",
+    "explanation": "Esto ocurre gracias a la acción del pigmento verde denominado clorofila."
   },
   {
     "id": 4,
-    "question": "¿Qué sustancia facilita la transformación de la energía lumínica a química?",
+    "question": "¿Qué se transforma en el interior de los cloroplastos?",
     "options": [
-      "El dióxido de carbono",
-      "La glucosa",
-      "El agua",
-      "Clorofila"
+      "Agua y dióxido de carbono",
+      "Glucosa y oxígeno molecular",
+      "Luz solar y energía química",
+      "Clorofila y agua"
     ],
-    "correct_answer": "Clorofila",
-    "explanation": "Esto ocurre gracias a la acción del pigmento verde denominado clorofila."
+    "correct_answer": "Glucosa y oxígeno molecular",
+    "explanation": "El dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos."
+  },
+  {
+    "id": 5,
+    "question": "¿Qué elementos son transformados por las plantas y algas?",
+    "options": [
+      "Agua y energía",
+      "Dióxido de carbono y agua",
+      "Luz solar y glucosa",
+      "Clorofila y oxígeno"
+    ],
+    "correct_answer": "Dióxido de carbono y agua",
+    "explanation": "El dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular."
   }
 ]
