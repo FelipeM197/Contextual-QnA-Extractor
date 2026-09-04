@@ -51,10 +51,12 @@ def main():
     inputs_dir = project_dir / "inputs"
     outputs_dir = project_dir / "outputs"
     processed_dir = outputs_dir / "processed"
+    logs_dir = outputs_dir / "cuestionarios-logs"
     prompts_dir = project_dir / "prompts"
     
     inputs_dir.mkdir(parents=True, exist_ok=True)
     processed_dir.mkdir(parents=True, exist_ok=True)
+    logs_dir.mkdir(parents=True, exist_ok=True)
     prompts_dir.mkdir(parents=True, exist_ok=True)
     
     input_file_path = inputs_dir / args.input
@@ -71,7 +73,7 @@ def main():
     base_name = input_file_path.stem
     markdown_path = processed_dir / f"{base_name}.md"
     db_path = processed_dir / f"{base_name}.db"
-    cuestionario_path = outputs_dir / f"cuestionario_{base_name}.md"
+    cuestionario_path = logs_dir / f"cuestionario_{base_name}.md"
     
     # 2. Conversión e Ingesta Vectorial
     utils.convertir_a_markdown(input_file_path, markdown_path)

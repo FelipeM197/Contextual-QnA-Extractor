@@ -1,39 +1,183 @@
-# Cuestionario adaptado para estudiante universitario
+# Cuestionario para estudiante universitario
 
-## 1. ¿Cuál es el objetivo principal de la implementación de un Grafo Dirigido Acíclico (DAG) para automatizar la validación de prerrequisitos en una malla curricular universitaria?
+## 1. ¿Qué explica el documento sobre bfs?
 
-El objetivo principal de la implementación de un Grafo Dirigido Acíclico (DAG) para automatizar la validación de prerrequisitos en una malla curricular universitaria es prevenir errores en la planificación académica de los estudiantes y automatizar la validación de prerrequisitos.
+Fuente: CHUNK 1
+manera organizada cuales son las rutas de más viables para los estudiantes, con esto también
+demostramos que las estructuras de datos son una herramienta muy útil para resolver
+problemas en el mundo real.
+2. Objetivos
+Objetivo General:
+• Elaborar una aplicación en Python basada en POO que transforme una malla
+curricular a un grafo dirigido para el control de dependencias académicas, aplicando
+los algoritmos BFS y DFS para la exploración de rutas de estudio y cuál es la mejor
+ruta.
+Objetivos Específicos:
+• Elaborar un Grafo Dirigido Acíclico que represente a 20 nodos de las materias con sus
+prerrequisitos, generando la carga de los datos con un archivo JSON.
+• Diseñar el sistema principal y los algoritmos BFS y DFS mediante POO y el uso de
+funciones en Python.
+• Evaluar cuales fueron las rutas generadas para concluir cual tiene mayor eficiencia,
+todo esto acompañado de la visualización gráfica del recorrido final.
+3. Definición del Problema Real
+Todos los días los estudiantes de las diferentes universidades enfrentan el mismo problema al
+momento de organizar su ruta de matriculación, estos problemas ocurren por las restricciones
+por prerrequisitos en la malla curricular. Si llega a existir errores al escoger materias en los
+primeros semestres puede causar problemas como el bloqueo al acceso de asignaturas
+avanzadas y esto puede causar que el estudiante se retrase en su proceso de titulación. El
+problema radica en la falta de materiales visuales y validación de estas dependencias a largo
+plazo usando documentos ya establecidos. Cuando se modela la malla como un grafo
+dirigido, estamos cambiando este problema administrativo a un problema computacional, de
+esta manera podemos automatizar el proceso de la validación de prerrequisitos y así los
+estudiantes pueden encontrar rutas viables de estudio mediante algoritmos de búsqueda.
+Aplicando cada uno con un paradigma diferente, siendo BFS para encontrar la ruta más corta
+a una materia dada y DFS para visualizar todas las materias dependientes desde una materia
+dada, así sabiendo qué pasaría en caso de perder una materia y cómo esto afectaría a su
+recorrido académico,
 
-Fuente: CHUNK 3
+4. Modelado del Problema como Grafo
+Para modelar el problema de la planificación académica y validación de prerrequisitos nos
+basamos en la estructura y lógica de un Grafo Dirigido Acíclico. Esta elección de grafo la
+hicimos porque consideramos que es la mejor para
 
-## 2. ¿Cuál es el tipo de dato abstracto (ADT) utilizado en la implementación y qué paradigma de programación se emplea?
+Fuente: CHUNK 1
 
-La implementación utiliza el Tipo de Dato Abstracto (ADT) bajo el paradigma de Programación Orientada a Objetos (POO). El ADT se implementa mediante clases como Grafo, Nodo y Arista. Esto permite un control estricto mediante encapsulamiento, facilitando mantener la lógica algorítmica separada y limpia, y permitiendo su fácil integración con librerías externas de visualización como NetworkX.
+## 2. ¿Qué explica el documento sobre grafo?
 
-Fuente: CHUNK 3
+Fuente: CHUNK 1
+para concluir cual tiene mayor eficiencia,
+todo esto acompañado de la visualización gráfica del recorrido final.
+3. Definición del Problema Real
+Todos los días los estudiantes de las diferentes universidades enfrentan el mismo problema al
+momento de organizar su ruta de matriculación, estos problemas ocurren por las restricciones
+por prerrequisitos en la malla curricular. Si llega a existir errores al escoger materias en los
+primeros semestres puede causar problemas como el bloqueo al acceso de asignaturas
+avanzadas y esto puede causar que el estudiante se retrase en su proceso de titulación. El
+problema radica en la falta de materiales visuales y validación de estas dependencias a largo
+plazo usando documentos ya establecidos. Cuando se modela la malla como un grafo
+dirigido, estamos cambiando este problema administrativo a un problema computacional, de
+esta manera podemos automatizar el proceso de la validación de prerrequisitos y así los
+estudiantes pueden encontrar rutas viables de estudio mediante algoritmos de búsqueda.
+Aplicando cada uno con un paradigma diferente, siendo BFS para encontrar la ruta más corta
+a una materia dada y DFS para visualizar todas las materias dependientes desde una materia
+dada, así sabiendo qué pasaría en caso de perder una materia y cómo esto afectaría a su
+recorrido académico,
 
-## 3. ¿Cuál es el algoritmo utilizado para trazar rutas óptimas y qué ventajas tiene sobre otros algoritmos?
+4. Modelado del Problema como Grafo
+Para modelar el problema de la planificación académica y validación de prerrequisitos nos
+basamos en la estructura y lógica de un Grafo Dirigido Acíclico. Esta elección de grafo la
+hicimos porque consideramos que es la mejor para
 
-El algoritmo utilizado para trazar rutas óptimas es el Breadth-First Search (BFS). Según el contexto, BFS probó ser la herramienta indispensable para trazar rutas óptimas empleando colas, mientras que DFS resultó valioso para recorrer ramas completas de prerrequisitos de manera exhaustiva utilizando pilas.
+Fuente: CHUNK 1
 
-El BFS tiene varias ventajas sobre otros algoritmos. Una de ellas es que permite calcular la cantidad mínima de saltos o semestres necesarios para alcanzar una asignatura de niveles superiores. Esto lo hace útil para trazar la trayectoria académica más rápida y directa hacia una meta específica, optimizando el tiempo del estudiante.
+## 3. ¿Qué explica el documento sobre dfs?
 
-Además, el BFS cubre la necesidad de trazar la trayectoria académica más rápida y directa hacia una meta específica, optimizando el tiempo del estudiante.
+Fuente: CHUNK 1
+manera organizada cuales son las rutas de más viables para los estudiantes, con esto también
+demostramos que las estructuras de datos son una herramienta muy útil para resolver
+problemas en el mundo real.
+2. Objetivos
+Objetivo General:
+• Elaborar una aplicación en Python basada en POO que transforme una malla
+curricular a un grafo dirigido para el control de dependencias académicas, aplicando
+los algoritmos BFS y DFS para la exploración de rutas de estudio y cuál es la mejor
+ruta.
+Objetivos Específicos:
+• Elaborar un Grafo Dirigido Acíclico que represente a 20 nodos de las materias con sus
+prerrequisitos, generando la carga de los datos con un archivo JSON.
+• Diseñar el sistema principal y los algoritmos BFS y DFS mediante POO y el uso de
+funciones en Python.
+• Evaluar cuales fueron las rutas generadas para concluir cual tiene mayor eficiencia,
+todo esto acompañado de la visualización gráfica del recorrido final.
+3. Definición del Problema Real
+Todos los días los estudiantes de las diferentes universidades enfrentan el mismo problema al
+momento de organizar su ruta de matriculación, estos problemas ocurren por las restricciones
+por prerrequisitos en la malla curricular. Si llega a existir errores al escoger materias en los
+primeros semestres puede causar problemas como el bloqueo al acceso de asignaturas
+avanzadas y esto puede causar que el estudiante se retrase en su proceso de titulación. El
+problema radica en la falta de materiales visuales y validación de estas dependencias a largo
+plazo usando documentos ya establecidos. Cuando se modela la malla como un grafo
+dirigido, estamos cambiando este problema administrativo a un problema computacional, de
+esta manera podemos automatizar el proceso de la validación de prerrequisitos y así los
+estudiantes pueden encontrar rutas viables de estudio mediante algoritmos de búsqueda.
+Aplicando cada uno con un paradigma diferente, siendo BFS para encontrar la ruta más corta
+a una materia dada y DFS para visualizar todas las materias dependientes desde una materia
+dada, así sabiendo qué pasaría en caso de perder una materia y cómo esto afectaría a su
+recorrido académico,
 
-Fuente: CHUNK 2
+4. Modelado del Problema como Grafo
+Para modelar el problema de la planificación académica y validación de prerrequisitos nos
+basamos en la estructura y lógica de un Grafo Dirigido Acíclico. Esta elección de grafo la
+hicimos porque consideramos que es la mejor para
 
-## 4. ¿Cómo se implementan las validaciones de frontera en el sistema y qué beneficios aporta?
+Fuente: CHUNK 1
 
-La implementación de las validaciones de frontera en el sistema se logra mediante la detección de grafos desconectados. Esto se hace de manera determinista, lo que significa que el sistema puede identificar con certeza cuando se intenta acceder a una materia que no está conectada con otras materias en la malla curricular. Esto permite mantener un sistema consistente y evitar errores en la planificación académica de los estudiantes.
+## 4. ¿Qué explica el documento sobre figura?
 
-La implementación de las validaciones de frontera se logra mediante la integración de la herramienta NetworkX, que permite visualizar y analizar los grafos. Esto permite identificar y solucionar problemas de conectividad en la malla curricular, lo que a su vez permite a los estudiantes planificar su ruta académica de manera más efectiva.
+Fuente: CHUNK 1
+para concluir cual tiene mayor eficiencia,
+todo esto acompañado de la visualización gráfica del recorrido final.
+3. Definición del Problema Real
+Todos los días los estudiantes de las diferentes universidades enfrentan el mismo problema al
+momento de organizar su ruta de matriculación, estos problemas ocurren por las restricciones
+por prerrequisitos en la malla curricular. Si llega a existir errores al escoger materias en los
+primeros semestres puede causar problemas como el bloqueo al acceso de asignaturas
+avanzadas y esto puede causar que el estudiante se retrase en su proceso de titulación. El
+problema radica en la falta de materiales visuales y validación de estas dependencias a largo
+plazo usando documentos ya establecidos. Cuando se modela la malla como un grafo
+dirigido, estamos cambiando este problema administrativo a un problema computacional, de
+esta manera podemos automatizar el proceso de la validación de prerrequisitos y así los
+estudiantes pueden encontrar rutas viables de estudio mediante algoritmos de búsqueda.
+Aplicando cada uno con un paradigma diferente, siendo BFS para encontrar la ruta más corta
+a una materia dada y DFS para visualizar todas las materias dependientes desde una materia
+dada, así sabiendo qué pasaría en caso de perder una materia y cómo esto afectaría a su
+recorrido académico,
 
-El sistema también permite la visualización de la trayectoria académica más rápida y directa hacia una meta específica, lo que optimiza el tiempo del estudiante.
+4. Modelado del Problema como Grafo
+Para modelar el problema de la planificación académica y validación de prerrequisitos nos
+basamos en la estructura y lógica de un Grafo Dirigido Acíclico. Esta elección de grafo la
+hicimos porque consideramos que es la mejor para
 
-Fuente: CHUNK 3
+Fuente: CHUNK 1
 
-## 5. ¿Qué herramienta se utiliza para la revisión y mejora de la redacción del informe y qué propósitos se le asignan?
+## 5. ¿Qué explica el documento sobre malla?
 
-La herramienta utilizada para la revisión y mejora de la redacción del informe es Gemini 3.1 Pro. Se le asignan propósitos como "Mejora la redacción de este punto" y "Revisa la ortografía y gramática de este texto y sugiere correcciones".
+Fuente: CHUNK 1
+manera organizada cuales son las rutas de más viables para los estudiantes, con esto también
+demostramos que las estructuras de datos son una herramienta muy útil para resolver
+problemas en el mundo real.
+2. Objetivos
+Objetivo General:
+• Elaborar una aplicación en Python basada en POO que transforme una malla
+curricular a un grafo dirigido para el control de dependencias académicas, aplicando
+los algoritmos BFS y DFS para la exploración de rutas de estudio y cuál es la mejor
+ruta.
+Objetivos Específicos:
+• Elaborar un Grafo Dirigido Acíclico que represente a 20 nodos de las materias con sus
+prerrequisitos, generando la carga de los datos con un archivo JSON.
+• Diseñar el sistema principal y los algoritmos BFS y DFS mediante POO y el uso de
+funciones en Python.
+• Evaluar cuales fueron las rutas generadas para concluir cual tiene mayor eficiencia,
+todo esto acompañado de la visualización gráfica del recorrido final.
+3. Definición del Problema Real
+Todos los días los estudiantes de las diferentes universidades enfrentan el mismo problema al
+momento de organizar su ruta de matriculación, estos problemas ocurren por las restricciones
+por prerrequisitos en la malla curricular. Si llega a existir errores al escoger materias en los
+primeros semestres puede causar problemas como el bloqueo al acceso de asignaturas
+avanzadas y esto puede causar que el estudiante se retrase en su proceso de titulación. El
+problema radica en la falta de materiales visuales y validación de estas dependencias a largo
+plazo usando documentos ya establecidos. Cuando se modela la malla como un grafo
+dirigido, estamos cambiando este problema administrativo a un problema computacional, de
+esta manera podemos automatizar el proceso de la validación de prerrequisitos y así los
+estudiantes pueden encontrar rutas viables de estudio mediante algoritmos de búsqueda.
+Aplicando cada uno con un paradigma diferente, siendo BFS para encontrar la ruta más corta
+a una materia dada y DFS para visualizar todas las materias dependientes desde una materia
+dada, así sabiendo qué pasaría en caso de perder una materia y cómo esto afectaría a su
+recorrido académico,
+
+4. Modelado del Problema como Grafo
+Para modelar el problema de la planificación académica y validación de prerrequisitos nos
+basamos en la estructura y lógica de un Grafo Dirigido Acíclico. Esta elección de grafo la
+hicimos porque consideramos que es la mejor para
 
 Fuente: CHUNK 1
