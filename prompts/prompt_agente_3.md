@@ -9,7 +9,7 @@ Responde a la pregunta planteada utilizando de forma estricta y exclusiva la evi
    - Responde únicamente con información explícita del contexto.
    - Si el contexto no contiene información suficiente para responder con certeza a la pregunta, responde única y exactamente: "NO LO SÉ".
 2. Estilo de respuesta:
-   - Redacta una respuesta concisa, directa y factual. No incluyas muletillas como "Basado en el texto provisto..." o "Según el fragmento...".
+   - Redacta una respuesta con estas características: {a_len}. No incluyas muletillas como "Basado en el texto provisto..." o "Según el fragmento...".
 3. Formato de cita obligatoria:
    - Al final de tu respuesta (en una línea separada), incluye textualmente la etiqueta de la fuente de donde se extrajo la información (por ejemplo: `Fuente: CHUNK 1` o `Fuente: CHUNK 2`).
 </directrices_criticas>

@@ -1,0 +1,114 @@
+import argparse
+import os
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+from langchain_ollama import ChatOllama
+import utils
+import RAG
+
+# Asegura que los prints se muestren en tiempo real sin bloqueo de buffer en pipes/consola
+sys.stdout.reconfigure(line_buffering=True)
+
+def modelo_disponible(model_name: str, ollama_models_dir: str) -> bool:
+    """Verifica si el binario de Ollama existe y si el modelo está descargado en el directorio personalizado."""
+    ollama = shutil.which("ollama")
+    if not ollama:
+        return False
+        
+    # Se inyecta OLLAMA_MODELS explícitamente para que la CLI inspeccione la partición D: y no %USERPROFILE%
+    resultado = subprocess.run(
+        [ollama, "list"], capture_output=True, text=True, check=False,
+        env={**os.environ, "OLLAMA_MODELS": ollama_models_dir},
+    )
+    return any(line.startswith(model_name) for line in resultado.stdout.splitlines())
+
+def main():
+    parser = argparse.ArgumentParser(description="Disparador del Sistema QnA")
+    parser.add_argument("--env", type=str, default="010")
+    parser.add_argument("--input", type=str, required=True)
+    parser.add_argument("--encoding", type=str, default="utf-8")
+    parser.add_argument("--perfil", type=str, default="estudiante universitario")
+    parser.add_argument("--top_n", type=int, default=5)
+    parser.add_argument("--q_len", type=str, default="concisas y directas")
+    parser.add_argument("--a_len", type=str, default="detalladas y analiticas")
+    parser.add_argument("--modelo", type=str, default="llama3.1")
+    parser.add_argument("--temperatura", type=float, default=0.0)
+    parser.add_argument("--embedding", type=str, default="all-MiniLM-L6-v2")
+    parser.add_argument("--top_k", type=int, default=3)
+    
+    args = parser.parse_args()
+    
+    # 1. Configurar Entorno
+    utils.configurar_entorno()
+    
+    # Normalización de ruta base para ejecuciones indistintas desde repo root, sh/ o Python/
+    project_dir = Path.cwd().resolve()
+    if project_dir.name == "Python":
+        project_dir = project_dir.parent
+    
+    inputs_dir = project_dir / "inputs"
+    outputs_dir = project_dir / "outputs"
+    processed_dir = outputs_dir / "processed"
+    prompts_dir = project_dir / "prompts"
+    
+    inputs_dir.mkdir(parents=True, exist_ok=True)
+    processed_dir.mkdir(parents=True, exist_ok=True)
+    prompts_dir.mkdir(parents=True, exist_ok=True)
+    
+    input_file_path = inputs_dir / args.input
+    if not input_file_path.exists():
+        print(f"Error: No se encontró el archivo de entrada en {input_file_path}")
+        # Migración retrocompatible transparente si el archivo quedó en la ruta heredada del notebook
+        old_input = project_dir / "data" / "input" / args.input
+        if old_input.exists():
+            print(f"Moviendo {args.input} desde data/input hacia inputs/...")
+            shutil.copy2(old_input, input_file_path)
+        else:
+            return
+        
+    base_name = input_file_path.stem
+    markdown_path = processed_dir / f"{base_name}.md"
+    db_path = processed_dir / f"{base_name}.db"
+    cuestionario_path = outputs_dir / f"cuestionario_{base_name}.md"
+    
+    # 2. Conversión e Ingesta Vectorial
+    utils.convertir_a_markdown(input_file_path, markdown_path)
+    store = utils.abrir_o_crear_store(markdown_path, db_path, args.embedding)
+    
+    # 3. Preparación de Ollama (conmutación defensiva a fallback si el demonio no responde)
+    if modelo_disponible(args.modelo, os.environ["OLLAMA_MODELS"]):
+        llm = ChatOllama(model=args.modelo, temperature=args.temperatura)
+        print(f"[Main] Usando LLM: {args.modelo}")
+    else:
+        llm = None
+        print(f"[Main] Modelo {args.modelo} no disponible. Usando modo fallback.")
+        
+    # 4. Desacoplamiento de hiperparámetros hacia el grafo RAG
+    params = {
+        "top_n": args.top_n,
+        "top_k": args.top_k,
+        "q_len": args.q_len,
+        "a_len": args.a_len,
+        "perfil": args.perfil
+    }
+    
+    grafo = RAG.crear_grafo(llm, store, prompts_dir, params)
+    
+    # 5. Ejecutar Grafo con el estado mínimo requerido por Agente 1
+    transcripcion = markdown_path.read_text(encoding="utf-8")
+    initial_state = {
+        "transcripcion_original": transcripcion,
+        "perfil_objetivo": args.perfil
+    }
+    
+    print(f"\n[Main] Iniciando flujo RAG para perfil: {args.perfil}")
+    result = grafo.invoke(initial_state)
+    
+    # 6. Guardar Resultados finales
+    cuestionario_path.write_text(result["cuestionario_final"], encoding="utf-8")
+    print(f"\n[Main] Proceso terminado. Archivo generado en: {cuestionario_path}")
+
+if __name__ == "__main__":
+    main()
