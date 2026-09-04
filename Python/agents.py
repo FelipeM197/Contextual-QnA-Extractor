@@ -2,8 +2,8 @@ from pathlib import Path
 
 from langchain_ollama import ChatOllama
 
-from .config import Settings
-from .rag_tools import QAState, StructuredQuestions, context_certainty
+from config import Settings
+from rag_tools import QAState, StructuredQuestions, context_certainty
 
 
 def load_prompt(settings: Settings, name: str) -> str:

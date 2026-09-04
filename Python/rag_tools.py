@@ -5,7 +5,7 @@ from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from .config import Settings
+from config import Settings
 
 
 class QAState(TypedDict, total=False):
