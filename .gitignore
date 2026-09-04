@@ -1,41 +1,36 @@
-# =========================
-# Entornos Virtuales
-# =========================
-.venv
-.venv-1
-.venv-2
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
 env/
 venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# =========================
-# Caché y Archivos de Python
-# =========================
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-.ipynb_checkpoints/
-
-# =========================
-# Bases de Datos y RAG
-# =========================
-# Ignora las bases de datos de DuckDB
-*.db
-*.db.wal
-# Ignora la carpeta donde guardas la base vectorial
-data/vectorstore/
-
-# =========================
-# Modelos IA y Caché de Hugging Face
-# =========================
+# HuggingFace & Cache local
+.cache/
+huggingface/
 huggingface_cache/
-Ollama_Modelos/
+Python/d:\*
+Python/d:*
 
-# =========================
-# Datos y Resultados (Opcional)
-# =========================
-# Si no quieres subir los PDFs originales ni los resultados generados:
-# data/input/
-# outputs/
-# *.pdf
+# Archivos de sistema
+.DS_Store
+Thumbs.db
