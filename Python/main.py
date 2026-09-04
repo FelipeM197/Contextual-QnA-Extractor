@@ -2,10 +2,14 @@ import argparse
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from langchain_ollama import ChatOllama
 import utils
 import RAG
+
+# Asegura que los prints se muestren en tiempo real sin bloqueo de buffer en pipes/consola
+sys.stdout.reconfigure(line_buffering=True)
 
 def modelo_disponible(model_name: str, ollama_models_dir: str) -> bool:
     """Verifica si el binario de Ollama existe y si el modelo está descargado en el directorio personalizado."""

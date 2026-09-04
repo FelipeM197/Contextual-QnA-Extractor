@@ -34,9 +34,28 @@ echo " Respuestas    : $ANSWER_LENGTH"
 echo " Modelo LLM    : $MODEL_NAME (Temp: $TEMPERATURE)"
 echo "============================================="
 
-cd ../Python
+export PYTHONUNBUFFERED=1
 
-python main.py \
+# Ir a la carpeta del motor Python
+cd "$(dirname "$0")/../Python" || cd ../Python
+
+# Detectar intérprete Python (priorizando el entorno virtual local .venv)
+if [ -f "../.venv/Scripts/python.exe" ]; then
+    PYTHON_CMD="../.venv/Scripts/python.exe"
+elif [ -f "../.venv/bin/python" ]; then
+    PYTHON_CMD="../.venv/bin/python"
+elif command -v python &> /dev/null; then
+    PYTHON_CMD="python"
+elif command -v python3 &> /dev/null; then
+    PYTHON_CMD="python3"
+elif command -v py &> /dev/null; then
+    PYTHON_CMD="py"
+else
+    echo "Error: No se encontró intérprete de Python."
+    exit 1
+fi
+
+"$PYTHON_CMD" main.py \
   --env "$ENV_CODE" \
   --input "$INPUT_FILE" \
   --encoding "$ENCODING" \
