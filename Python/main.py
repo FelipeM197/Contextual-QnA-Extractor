@@ -11,16 +11,19 @@ import RAG
 # Asegura que los prints se muestren en tiempo real sin bloqueo de buffer en pipes/consola
 sys.stdout.reconfigure(line_buffering=True)
 
-def modelo_disponible(model_name: str, ollama_models_dir: str) -> bool:
-    """Verifica si el binario de Ollama existe y si el modelo está descargado en el directorio personalizado."""
+def modelo_disponible(model_name: str, ollama_models_dir: str = "") -> bool:
+    """Verifica si el binario de Ollama existe y si el modelo está descargado."""
     ollama = shutil.which("ollama")
     if not ollama:
         return False
         
-    # Se inyecta OLLAMA_MODELS explícitamente para que la CLI inspeccione la partición D: y no %USERPROFILE%
+    env = os.environ.copy()
+    if ollama_models_dir:
+        env["OLLAMA_MODELS"] = ollama_models_dir
+
     resultado = subprocess.run(
         [ollama, "list"], capture_output=True, text=True, check=False,
-        env={**os.environ, "OLLAMA_MODELS": ollama_models_dir},
+        env=env,
     )
     return any(line.startswith(model_name) for line in resultado.stdout.splitlines())
 
@@ -80,7 +83,8 @@ def main():
     store = utils.abrir_o_crear_store(markdown_path, db_path, args.embedding)
     
     # 3. Preparación de Ollama (conmutación defensiva a fallback si el demonio no responde)
-    if modelo_disponible(args.modelo, os.environ["OLLAMA_MODELS"]):
+    ollama_dir = os.environ.get("OLLAMA_MODELS", "")
+    if modelo_disponible(args.modelo, ollama_dir):
         llm = ChatOllama(model=args.modelo, temperature=args.temperatura)
         print(f"[Main] Usando LLM: {args.modelo}")
     else:

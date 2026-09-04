@@ -1,4 +1,5 @@
 import os
+import sys
 import re
 from pathlib import Path
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -9,16 +10,17 @@ from raghilda.read import read_as_markdown
 from raghilda.store import DuckDBStore
 
 def configurar_entorno():
-    """Redirige caches y pesos de modelos a volumen secundario D: para no agotar disco C:."""
-    ollama_models_dir = Path(r"d:\Ollama_Modelos")
-    hf_cache_dir = Path(r"d:\labADA\huggingface_cache")
-    
-    # Modelos LLM y embeddings saturan rápidamente el almacenamiento raíz del sistema
-    ollama_models_dir.mkdir(parents=True, exist_ok=True)
-    hf_cache_dir.mkdir(parents=True, exist_ok=True)
-    os.environ["OLLAMA_MODELS"] = str(ollama_models_dir)
-    os.environ["HF_HOME"] = str(hf_cache_dir)
-    print(f"[Utils] Entorno configurado. OLLAMA_MODELS={ollama_models_dir}")
+    """Redirige caches y pesos de modelos únicamente si existe la partición D: en Windows."""
+    if sys.platform == "win32" and Path("D:/").exists():
+        ollama_models_dir = Path(r"d:\Ollama_Modelos")
+        hf_cache_dir = Path(r"d:\labADA\huggingface_cache")
+        ollama_models_dir.mkdir(parents=True, exist_ok=True)
+        hf_cache_dir.mkdir(parents=True, exist_ok=True)
+        os.environ["OLLAMA_MODELS"] = str(ollama_models_dir)
+        os.environ["HF_HOME"] = str(hf_cache_dir)
+        print(f"[Utils] Entorno Windows configurado. OLLAMA_MODELS={ollama_models_dir}")
+    else:
+        print("[Utils] Entorno Linux/macOS configurado con rutas por defecto.")
 
 def convertir_a_markdown(source_path: Path, target_path: Path) -> Path:
     """Convierte el documento origen a Markdown de forma idempotente."""

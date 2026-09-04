@@ -198,8 +198,18 @@ class QnAGuiApp(ctk.CTk):
             self._log(f"[INFO] Archivo seleccionado: {self.selected_file_path}")
 
     def _log(self, text: str):
-        self.log_textbox.insert("end", text + "\n")
-        self.log_textbox.see("end")
+        self.after(0, self._append_log, text)
+
+    def _append_log(self, text: str):
+        if text.strip():
+            self.log_textbox.insert("end", text + "\n")
+            self.log_textbox.see("end")
+
+    def _set_status(self, text: str, color: str):
+        self.after(0, lambda: self.status_label.configure(text=text, text_color=color))
+
+    def _set_btn(self, state: str, text: str):
+        self.after(0, lambda: self.run_btn.configure(state=state, text=text))
 
     def _open_outputs_folder(self):
         folder = str(self.outputs_dir)
@@ -253,6 +263,7 @@ class QnAGuiApp(ctk.CTk):
             ]
 
             env = os.environ.copy()
+            env["PYTHONUNBUFFERED"] = "1"
             env["PYTHONPATH"] = str(self.project_dir / "python") + ":" + str(self.project_dir / "Python")
 
             process = subprocess.Popen(
@@ -267,24 +278,24 @@ class QnAGuiApp(ctk.CTk):
 
             for line in iter(process.stdout.readline, ''):
                 if line:
-                    self._log(line.strip())
+                    self._log(line.rstrip())
 
             process.stdout.close()
             process.wait()
 
             if process.returncode == 0:
-                self.status_label.configure(text="Estado: ¡Completado!", text_color="#10B981")
+                self._set_status("Estado: ¡Completado!", "#10B981")
                 self._log("\n✅ [ÉXITO] ¡Proceso terminado con éxito!")
             else:
-                self.status_label.configure(text="Estado: Error", text_color="#EF4444")
+                self._set_status("Estado: Error", "#EF4444")
                 self._log(f"\n❌ [ERROR] El proceso terminó con código de error {process.returncode}")
 
         except Exception as e:
             self._log(f"\n❌ [EXCEPCIÓN] {str(e)}")
-            self.status_label.configure(text="Estado: Error", text_color="#EF4444")
+            self._set_status("Estado: Error", "#EF4444")
 
         finally:
-            self.run_btn.configure(state="normal", text="🚀 GENERAR CUESTIONARIO")
+            self._set_btn("normal", "🚀 GENERAR CUESTIONARIO")
 
 if __name__ == "__main__":
     app = QnAGuiApp()
