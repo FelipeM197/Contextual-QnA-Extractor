@@ -19,7 +19,6 @@ class GenerationOutput(BaseModel):
 class QAState(TypedDict):
     raw_content: str
     cleaned_text: str
-    chunks: List[str]
     key_terms: List[str]
     target_profile: str
     bloom_level: str

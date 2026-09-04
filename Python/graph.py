@@ -1,6 +1,6 @@
 from langgraph.graph import END, START, StateGraph
 
-from .rag_tools import QAState
+from rag_tools import QAState
 
 
 def build_graph(analyst, question_generator, resolver, adapter):

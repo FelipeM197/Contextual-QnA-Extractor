@@ -17,7 +17,7 @@ QUESTION_LENGTH="concisas y directas, máximo 15 palabras"
 ANSWER_LENGTH="detalladas y analíticas, de al menos dos párrafos"
 
 # 4. Parámetros de Inteligencia Artificial
-MODEL_NAME="llama3.1"
+MODEL_NAME="gemma4:e2b"
 TEMPERATURE="0"
 EMBEDDING_MODEL="all-MiniLM-L6-v2"
 TOP_K_CHUNKS="3"

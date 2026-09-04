@@ -5,7 +5,7 @@ from raghilda.chunker import MarkdownChunker
 from raghilda.read import read_as_markdown
 from raghilda.store import DuckDBStore
 
-from .config import Settings
+from config import Settings
 
 
 def convert_to_markdown(source_path: Path, target_path: Path) -> Path:
