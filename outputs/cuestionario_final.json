@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "question": "¿Qué evento histórico marcó el resurgimiento del Manchester United tras la tragedia de 1958?",
+    "options": [
+      "La victoria en la Copa Mundial de Clubes de la FIFA.",
+      "La coronación como campeón de Europa en 1968.",
+      "El fallecimiento de ocho jugadores en Múnich, Alemania.",
+      "La fundación bajo el nombre de Newton Heath LYR FC."
+    ],
+    "correct_answer": "El fallecimiento de ocho jugadores en Múnich, Alemania.",
+    "explanation": "El texto indica que el club resurgió 'lejos de desaparecer' tras la tragedia del avión en Múnich en 1958."
+  },
+  {
+    "id": 2,
+    "question": "¿Cuál fue el logro máximo de la era Sir Alex Ferguson en términos de títulos europeos?",
+    "options": [
+      "Ganar la Premier League y la FA Cup simultáneamente.",
+      "Conquistar dos Ligas de Campeones de la UEFA.",
+      "Obtener un Triplete con la Copa Mundial de Clubes.",
+      "Alcanzar el máximo goleador histórico del club."
+    ],
+    "correct_answer": "Conquistar dos Ligas de Campeones de la UEFA.",
+    "explanation": "Bajo Ferguson, el United conquistó 2 Ligas de Campeones de la UEFA (1999 y 2008)."
+  },
+  {
+    "id": 3,
+    "question": "¿Qué elemento cultural definió la era dominante del Manchester United bajo Sir Alex Ferguson?",
+    "options": [
+      "La búsqueda exclusiva de títulos internacionales.",
+      "Una mentalidad ganadora basada en el talento joven.",
+      "El enfoque exclusivo en las leyendas históricas.",
+      "La disciplina militar y la obediencia total."
+    ],
+    "correct_answer": "Una mentalidad ganadora basada en el talento joven.",
+    "explanation": "Ferguson instauró una cultura basada en la disciplina, el talento joven (Clase del 92) y una mentalidad ganadora inquebrantable."
+  },
+  {
+    "id": 4,
+    "question": "¿Qué figura histórica se considera el máximo goleador de la institución Manchester United?",
+    "options": [
+      "Eric Cantona",
+      "Roy Keane",
+      "Cristiano Ronaldo",
+      "Wayne Rooney"
+    ],
+    "correct_answer": "Wayne Rooney",
+    "explanation": "El texto menciona explícitamente a Wayne Rooney como el máximo goleador histórico de la institución."
+  },
+  {
+    "id": 5,
+    "question": "¿Qué aspecto define la actual magnitud global del Manchester United?",
+    "options": [
+      "Su legado histórico y sus leyendas inmortales.",
+      "Su posición como club más laureado en el fútbol mundial.",
+      "Su músculo financiero y su base de aficionados fiel.",
+      "La transición exitosa post-Ferguson en 2013."
+    ],
+    "correct_answer": "Su músculo financiero y su base de aficionados fiel.",
+    "explanation": "El club mantiene una magnitud global, siendo uno de los de mayor músculo financiero y contando con masas de aficionados numerosas."
+  }
+]

@@ -1,19 +1,15 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict
-
-# Nos aseguramos de que datetime tenga UTC por si acaso
-if not hasattr(datetime, "UTC"):
-    datetime.UTC = datetime.timezone.utc
 
 class RAGLogger:
     def __init__(self, outputs_dir: Path):
         self.logs_dir = outputs_dir / "logs"
         self.logs_dir.mkdir(parents=True, exist_ok=True)
         
-        timestamp = datetime.now(datetime.UTC).strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         self.log_file = self.logs_dir / f"run_{timestamp}.log"
         
         # Escribimos un evento de inicio
@@ -23,7 +19,7 @@ class RAGLogger:
     def log_event(self, event_type: str, data: Dict[str, Any]):
         """Escribe un evento en formato JSONL."""
         log_entry = {
-            "timestamp": datetime.now(datetime.UTC).isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "event": event_type,
             "data": data
         }
