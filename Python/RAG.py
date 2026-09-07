@@ -13,6 +13,7 @@ class QAState(TypedDict, total=False):
     respuestas_crudas: list[dict[str, str]]
     perfil_objetivo: str
     cuestionario_final: str
+    directivas_estilo: str
 
 def certeza_contexto(contexto: str) -> float:
     """Heurística de certeza ligada a la densidad de fragmentos recuperados (tope 0.95)."""
@@ -52,6 +53,24 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
     q_len = params.get("q_len", "concisas y directas")
     a_len = params.get("a_len", "detalladas y analiticas")
 
+    def agente_0_empatico(state: QAState) -> dict:
+        print("[Agente Empático] Analizando interacciones y estado emocional del usuario...", flush=True)
+        perfil = state.get("perfil_objetivo", "estudiante universitario")
+        prompt_base = cargar_prompt(prompts_dir, "prompt_agente_empatico")
+        
+        if llm is not None and prompt_base:
+            try:
+                print(f"[Agente Empático] Invocando Ollama para definir directivas de estilo...", flush=True)
+                prompt = prompt_base.replace("{perfil}", perfil)
+                directivas = llm.invoke(prompt).content.strip()
+            except Exception as e:
+                directivas = "- Tono: Dinámico, misterioso y cautivador\n- Enfoque: Consecuencias inesperadas y controversias (fallback)"
+        else:
+            directivas = "- Tono: Dinámico, misterioso y cautivador\n- Enfoque: Consecuencias inesperadas y controversias (fallback)"
+            
+        print("[Agente Empático] Directivas generadas exitosamente.", flush=True)
+        return {"directivas_estilo": directivas}
+
     def agente_1_analista(state: QAState) -> dict:
         print("[Agente 1] Evidencia: transcripción recibida", flush=True)
         conceptos = utils.extraer_conceptos_tfidf(state["transcripcion_original"], top_n=top_n)
@@ -67,7 +86,8 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
         
         prompt = prompt_base.replace("{conceptos}", conceptos_str)\
                             .replace("{texto}", state["transcripcion_original"])\
-                            .replace("{q_len}", q_len)
+                            .replace("{q_len}", q_len)\
+                            .replace("{directivas_estilo}", state.get("directivas_estilo", ""))
         
         if llm is not None:
             try:
@@ -114,7 +134,8 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
                 try:
                     prompt = prompt_base.replace("{pregunta}", pregunta)\
                                         .replace("{contexto}", contexto)\
-                                        .replace("{a_len}", a_len)
+                                        .replace("{a_len}", a_len)\
+                                        .replace("{directivas_estilo}", state.get("directivas_estilo", ""))
                     print(f"[Agente 3] ({idx}/{total_q}) Invocando Ollama para responder con evidencia...", flush=True)
                     respuesta = llm.invoke(prompt).content
                     metodo = "respuesta del LLM limitada al contexto"
@@ -144,7 +165,9 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
                     f"Q: {item['pregunta']}\nA: {item['respuesta']}" for item in state["respuestas_crudas"]
                 )
                 prompt_base = cargar_prompt(prompts_dir, "prompt_agente_4")
-                prompt = prompt_base.replace("{perfil}", perfil).replace("{contenido}", contenido)
+                prompt = prompt_base.replace("{perfil}", perfil)\
+                                    .replace("{contenido}", contenido)\
+                                    .replace("{directivas_estilo}", state.get("directivas_estilo", ""))
                 print(f"[Agente 4] Invocando Ollama para formatear cuestionario al perfil '{perfil}'...", flush=True)
                 final = llm.invoke(prompt).content
                 metodo = "adaptación del LLM con etiquetas preservadas"
@@ -169,14 +192,16 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
         print(f"[Agente 4] Certeza de formato: {certeza:.2f}", flush=True)
         return {"cuestionario_final": final}
 
-    # Topología strictly secuencial: Analista -> Formulador -> Resolutor -> Adaptador
+    # Topología strictly secuencial: Empático -> Analista -> Formulador -> Resolutor -> Adaptador
     graph_builder = StateGraph(QAState)
+    graph_builder.add_node("agente_0_empatico", agente_0_empatico)
     graph_builder.add_node("agente_1_analista", agente_1_analista)
     graph_builder.add_node("agente_2_preguntas", agente_2_preguntas)
     graph_builder.add_node("agente_3_resolutor", agente_3_resolutor)
     graph_builder.add_node("agente_4_adaptador", agente_4_adaptador)
     
-    graph_builder.add_edge(START, "agente_1_analista")
+    graph_builder.add_edge(START, "agente_0_empatico")
+    graph_builder.add_edge("agente_0_empatico", "agente_1_analista")
     graph_builder.add_edge("agente_1_analista", "agente_2_preguntas")
     graph_builder.add_edge("agente_2_preguntas", "agente_3_resolutor")
     graph_builder.add_edge("agente_3_resolutor", "agente_4_adaptador")

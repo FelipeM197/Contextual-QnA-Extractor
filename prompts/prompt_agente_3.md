@@ -14,6 +14,10 @@ Responde a la pregunta planteada utilizando de forma estricta y exclusiva la evi
    - Al final de tu respuesta (en una línea separada), incluye textualmente la etiqueta de la fuente de donde se extrajo la información (por ejemplo: `Fuente: CHUNK 1` o `Fuente: CHUNK 2`).
 </directrices_criticas>
 
+<directivas_de_estilo>
+{directivas_estilo}
+</directivas_de_estilo>
+
 <contexto>
 {contexto}
 </contexto>

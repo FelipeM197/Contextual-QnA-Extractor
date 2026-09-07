@@ -16,6 +16,10 @@ Reescribe el cuestionario recopilado ajustando el registro, el tono y la clarida
    - Está estrictamente prohibido eliminar, resumir, traducir o mover estas etiquetas.
 </directrices_de_adaptacion>
 
+<directivas_de_estilo>
+{directivas_estilo}
+</directivas_de_estilo>
+
 <cuestionario_crudo>
 {contenido}
 </cuestionario_crudo>
