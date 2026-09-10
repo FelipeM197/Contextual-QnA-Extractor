@@ -63,12 +63,9 @@ def main():
     logs_dir.mkdir(parents=True, exist_ok=True)
     prompts_dir.mkdir(parents=True, exist_ok=True)
     
-    # Iniciar Arize Phoenix y el auto-tracing de LangChain/LangGraph
-    print("\n[Main] Iniciando servidor de observabilidad Arize Phoenix...")
-    try:
-        px.launch_app()
-    except Exception as e:
-        print(f"[Main] Advertencia: Arize Phoenix ya está corriendo o no pudo iniciar ({e})")
+    # Configurar el envío de trazas al servidor independiente de Phoenix
+    print("\n[Main] Conectando Instrumentador a Phoenix local (http://127.0.0.1:6006)...")
+    os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "http://127.0.0.1:6006/v1/traces"
     LangChainInstrumentor().instrument()
     
     input_file_path = inputs_dir / args.input
