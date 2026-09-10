@@ -27,7 +27,7 @@ class QnAGuiApp(ctk.CTk):
         self.geometry("900 x 720")
         self.minsize(800, 600)
 
-        self.project_dir = Path(__file__).resolve().parent
+        self.project_dir = Path(__file__).resolve().parents[1]
         self.inputs_dir = self.project_dir / "inputs"
         self.outputs_dir = self.project_dir / "outputs" / "cuestionarios-logs"
         

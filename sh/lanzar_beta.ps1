@@ -12,7 +12,7 @@ $TOP_N_CONCEPTS = 5
 $QUESTION_LENGTH = "concisas y directas, máximo 15 palabras"
 $ANSWER_LENGTH = "detalladas y analíticas, de al menos dos párrafos"
 
-$MODEL_NAME = "gemma4:e2b"
+$MODEL_NAME = "llama3.1"
 $TEMPERATURE = 0
 $EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 $TOP_K_CHUNKS = 3

@@ -40,7 +40,7 @@ st.markdown("""
 st.markdown('<div class="main-title">⚡ Contextual QnA Extractor</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-title">Interfaz Web Interactiva RAG Multi-Agente con Ollama & LangGraph</div>', unsafe_allow_html=True)
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parents[1]
 INPUTS_DIR = BASE_DIR / "inputs"
 OUTPUTS_DIR = BASE_DIR / "outputs" / "cuestionarios-logs"
 

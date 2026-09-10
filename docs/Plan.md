@@ -1,166 +1,164 @@
-Plan de Implementación Estratégica: Arquitectura Multi-Agente RAG + LangGraph
+Guía de Arquitectura Modular: Sistema QnA RAG con LangGraph
 
-Este documento establece las directrices, el enfoque de desarrollo y la planeación paso a paso para implementar un sistema de 4 agentes con LangGraph y el motor RAG de Raghilda (basado en DuckDB).
+Esta guía documenta la estructura definitiva del proyecto en su fase "Beta", explicando la responsabilidad de cada directorio y archivo, y cómo se mapea la lógica del Sistema_QnA-main.ipynb original hacia el nuevo diseño modular de Python. El objetivo de esta reestructuración es lograr un sistema escalable, mantenible y preparado para integraciones futuras (como bases de datos de configuración), separando claramente la orquestación, las herramientas de soporte y la lógica de inteligencia artificial.
 
-El enfoque principal de esta guía es proporcionar instrucciones específicas de programación, diseño de prompts y manejo de flujo de datos, garantizando la integración fluida del RAG y la restricción estricta al disco D para almacenamiento.
+1. Estructura General de Carpetas
 
-Fase 0: Preparación Segura del Entorno (Restricción Disco D)
+La arquitectura adopta un enfoque orientado a componentes, aislando el punto de entrada, los datos, las plantillas y el código fuente:
 
-Enfoque de Configuración:
-El mayor riesgo al usar modelos locales es saturar el disco principal (C:). Antes de importar librerías de IA, debes garantizar mediante código que las dependencias utilicen tu disco secundario.
+sh/: Panel de control y disparador del proyecto. Aquí reside la configuración inicial.
 
-Instrucciones de Implementación:
+inputs/: Buzón de entrada para documentos crudos (PDFs, DOCX, TXT).
 
-Al inicio de tu script principal, antes de cualquier importación de LangChain o Raghilda, utiliza la librería nativa de Python os para establecer programáticamente las variables de entorno.
+outputs/: Almacenamiento de los cuestionarios finales generados y subproductos procesados.
 
-Configura OLLAMA_MODELS apuntando a tu carpeta D:\Ollama_Modelos.
+prompts/: Repositorio de instrucciones en texto plano para los agentes.
 
-Configura HF_HOME apuntando a D:\labADA\huggingface_cache.
+Python/ (o src/): El motor lógico del sistema, donde reside el código modular.
 
-Instala las librerías necesarias en tu entorno virtual. Dado que ya tienes Raghilda, asegúrate de contar con LangGraph, LangChain-Ollama, Pydantic, scikit-learn y MarkItDown. No uses corchetes en las instalaciones si tu terminal presenta problemas; instala sentence-transformers por separado si es necesario.
+2. Detalle por Carpeta y Archivo
 
-Fase 1: Módulo de Ingesta de Datos y RAG (Fuera del Grafo)
+A continuación, se detalla la función específica de cada archivo, qué código debe contener y qué celdas del Notebook original reemplaza o adapta.
 
-Enfoque de Programación:
-Una regla de oro en LangGraph es que el grafo no debe encargarse de procesar PDFs pesados ni inicializar bases de datos desde cero. La ingesta de datos ocurre una sola vez, ANTES de invocar el grafo de agentes.
+2.1 Carpeta sh/ (El Orquestador)
 
-Instrucciones de Implementación:
+Función: Actúa como el único punto de entrada (Entry Point) del sistema. Su propósito es aislar las configuraciones (los parámetros) del código fuente en Python. En esta fase Beta, los parámetros están "quemados" (hardcodeados) en un script Bash, pero el diseño permite que en el futuro este script sea el responsable de consultar una base de datos MySQL (basándose en un ENV_CODE como 010) para obtener la configuración antes de lanzar el programa.
 
-Conversión Universal: Escribe una función cuya única responsabilidad sea usar MarkItDown. Esta función recibirá la ruta de tu documento original y creará un archivo documento_base.md en el disco D.
+Archivo: lanzar_beta.sh
 
-Construcción del Vector Store:
-Crea una función separada que inicialice tu base de datos Raghilda:
+Descripción Detallada:
+Es un Shell Script que define todas las variables de entorno y de ejecución. Configura qué documento procesar (INPUT_FILE), el perfil objetivo (TARGET_PROFILE), el modelo LLM a utilizar (MODEL_NAME, TEMPERATURE), el modelo de embeddings (EMBEDDING_MODEL), y los parámetros dinámicos para la longitud y cantidad de las interacciones (TOP_N_CONCEPTS, QUESTION_LENGTH, ANSWER_LENGTH, TOP_K_CHUNKS).
 
-Instancia el modelo EmbeddingSentenceTransformers (usa "all-MiniLM-L6-v2" para que sea rápido y ligero).
+Mecánica: Tras definir estas variables, el script ejecuta un comando echo para mostrar un resumen visual en la terminal y luego invoca el archivo principal de Python inyectándole todos estos parámetros mediante banderas (--env, --input, etc.).
 
-Pasa tu archivo Markdown por el MarkdownChunker.
+2.2 Carpeta inputs/
 
-Realiza un upsert y build_index en la base de datos chatlas_hf.db.
+Función: Actuar como el repositorio de lectura inicial para el sistema.
 
-Bloqueos de Archivo: Cuando termines la ingesta y vayas a usar la base de datos dentro del grafo (para buscar contexto), asegúrate de conectarte a DuckDB con el parámetro de solo lectura activado. Esto previene bloqueos de archivo (file locks) durante la ejecución paralela o concurrente.
+Archivos esperados: Archivos crudos que el usuario deposita para ser analizados, como Informe Proyecto Bim 1 EDAII.pdf, o Nodo Actual Análisis.pdf. El sistema (a través de MarkItDown) leerá estos archivos para comenzar el flujo de extracción.
 
-Fase 2: Diseño del Estado Global (QAState)
+2.3 Carpeta outputs/
 
-Enfoque de Programación:
-El estado es la memoria compartida de todos los agentes. Debe estar fuertemente tipado. Evita diccionarios genéricos; usa TypedDict para prevenir errores de llaves inexistentes. La filosofía aquí es la inmutabilidad: los agentes añaden datos al estado, no los sobrescriben.
+Función: Almacenar todo el material generado por el sistema, separando los entregables finales de los archivos de soporte intermedios.
 
-Instrucciones de Implementación:
-Define tu clase de estado con las siguientes propiedades exactas:
+Archivos en la Raíz: Los cuestionarios finales en formato Markdown (ej. cuestionario_Informe Proyecto Bim 1 EDAII.md). Estos son los entregables que el usuario final consumirá.
 
-transcripcion_original: Cadena de texto. Contiene el texto base inyectado al inicio.
+Subcarpeta processed/:
 
-conceptos_clave: Lista de cadenas. Alimentada por el Agente 1.
+Archivos Markdown Convertidos (.md): El resultado de pasar los PDFs crudos por la herramienta MarkItDown. Mantenerlos aquí evita reprocesar documentos grandes innecesariamente.
 
-preguntas_generadas: Lista de cadenas. Alimentada por el Agente 2.
+Bases de Datos Vectoriales (.db): Los archivos generados por DuckDBStore (utilizando la extensión VSS). Aquí persisten los chunks vectorizados del documento, permitiendo búsquedas semánticas eficientes en ejecuciones posteriores sin necesidad de re-ingestar todo el texto.
 
-respuestas_crudas: Lista de diccionarios. Alimentada por el Agente 3. Cada diccionario debe tener la pregunta, la respuesta generada y la cita de la fuente.
+2.4 Carpeta prompts/
 
-perfil_objetivo: Cadena de texto. Define la audiencia (ej. "estudiante universitario").
+Función: Desacoplar la personalidad y las reglas de los agentes de la lógica pura en Python.
 
-cuestionario_final: Cadena de texto. El Markdown final formateado por el Agente 4.
+Archivos: prompt_agente_2.md, prompt_agente_3.md, prompt_agente_4.md.
 
-Fase 3: Ingeniería de Herramientas (Tools)
+Descripción: Al mantener estas instrucciones en archivos de texto, cualquier persona (incluso sin conocimientos de programación) puede ajustar el comportamiento de los agentes. El código Python simplemente lee estos archivos y reemplaza marcadores (como {conceptos}, {texto}, {q_len}) con los valores en tiempo de ejecución.
 
-Enfoque de Programación:
-En LangChain, las herramientas son funciones decoradas con @tool. La clave del éxito aquí es manejar los errores internamente para que, si una herramienta falla, no detenga todo el grafo, sino que devuelva un mensaje de error que el LLM pueda entender.
+2.5 Carpeta Python/ (El Motor del Proyecto)
 
-Instrucciones de Implementación:
+Esta carpeta reemplaza por completo a los Notebooks (Sistema_QnA-main.ipynb). Se ha dividido la lógica en tres módulos especializados.
 
-Tool 1 (Extractor TF-IDF): Toma la lógica que ya tienes en el archivo base, adáptala para limpiar puntuación y extraer los 5 conceptos más relevantes.
+Archivo A: main.py (El Controlador)
 
-Tool 2 (Estructurador Pydantic): Para evitar que el LLM alucine o devuelva texto basura (ej. "¡Claro! Aquí tienes tus preguntas..."), define una clase de Pydantic que represente una lista de strings. Usarás el método .with_structured_output() sobre tu LLM para forzarlo a devolver exactamente este objeto.
+Función: Es el puente entre las instrucciones del usuario (el archivo .sh) y el procesamiento interno.
 
-Tool 3 (Recuperador RAG):
+Descripción Detallada:
 
-Esta es tu conexión con DuckDB.
+Utiliza la librería argparse para atrapar todas las banderas (--env, --perfil, etc.) enviadas por lanzar_beta.sh.
 
-La herramienta debe recibir un string (una pregunta).
+Define y construye las rutas dinámicas hacia inputs/ y outputs/processed/ basándose en el nombre del archivo proporcionado.
 
-Ejecutará store.retrieve(pregunta, top_k=3).
+Llama a las funciones en utils.py para preparar el entorno, convertir el PDF a Markdown y levantar la base vectorial en DuckDB.
 
-Formato Crítico: No devuelvas una lista de objetos al LLM. Concatena los textos recuperados en un solo string gigante, pero introduce delimitadores visuales severos entre ellos (por ejemplo: "--- INICIO CHUNK 1 --- 
+Instancia el modelo LLM (ChatOllama) y verifica su disponibilidad local.
 
-$$texto$$
+Invoca a RAG.py para construir el grafo y le envía el estado inicial (QAState) para comenzar la ejecución.
 
- --- FIN CHUNK 1 ---"). Esto es absolutamente vital para que el LLM pueda realizar citaciones precisas en la Fase 4.
+Toma la salida final del grafo y la escribe en un nuevo archivo en la carpeta outputs/.
 
-Fase 4: Orquestación de los 4 Agentes
+Celdas Originales Reemplazadas:
 
-Enfoque de Programación:
-Cada agente (nodo) en LangGraph es simplemente una función de Python que recibe el QAState actual y devuelve un diccionario con las llaves que desea actualizar.
+Celda 6 (Verificación del modelo Ollama).
 
-Instrucciones de Implementación:
+Celda 9 (Ejecución del grafo e inicialización del QAState).
 
-Agente 1 (Analista): No malgastes llamadas al LLM aquí. Este agente es puramente determinístico. Pasa la transcripción por la Tool 1 y devuelve la lista de conceptos.
+Celda 10 (Exportación del archivo de texto final).
 
-Agente 2 (Generador): Construye un Prompt que obligue al LLM a formular 5 preguntas basadas en los conceptos del Agente 1. Aplica la Tool 2 (Pydantic) para que el retorno sea directamente iterable en Python.
+Archivo B: utils.py (Soporte Técnico y Herramientas)
 
-Agente 3 (Resolutor RAG - El Núcleo):
+Función: Agrupar todas las funciones de limpieza, conversión de formatos, procesamiento determinista de texto y gestión de bases de datos. Almacena las "herramientas" que no forman parte de la arquitectura del grafo en sí, manteniendo el código principal limpio.
 
-Este nodo es el más complejo. Debe contener un bucle for que itere sobre cada pregunta generada por el Agente 2.
+Descripción Detallada:
 
-Por cada pregunta, llama a la Tool 3 (Recuperador) para obtener los chunks.
+configurar_entorno(): Redirige los directorios temporales de HuggingFace y Ollama para evitar el consumo excesivo en el disco principal.
 
-Ingeniería de Prompt: El System Prompt de este agente debe ser draconiano. Instrucciones como: "RESPONDE ÚNICAMENTE BASADO EN EL CONTEXTO PROVISTO. SI LA RESPUESTA NO ESTÁ EN EL CONTEXTO, DI 'NO LO SÉ'. DEBES TERMINAR TU RESPUESTA CITANDO LA FUENTE EXACTA USANDO EL NOMBRE DEL CHUNK PROVISTO".
+convertir_a_markdown(): Llama a MarkItDown para transformar el documento fuente (PDF/DOCX) a texto plano.
 
-Almacena los resultados en una estructura de datos clara dentro de respuestas_crudas.
+abrir_o_crear_store(): Gestiona el ciclo de vida de DuckDB. Se encarga de aplicar chunking al Markdown y crear los índices HNSW para las búsquedas vectoriales, o simplemente conectar a una base existente de solo lectura.
 
-Agente 4 (Adaptador):
+extraer_conceptos_tfidf(): Una función matemática determinista que usa TfidfVectorizer (con un diccionario de stop words en español) para identificar los términos más importantes de un texto. A diferencia del Notebook original, ahora acepta un parámetro dinámico top_n para definir cuántos conceptos extraer.
 
-Este es un agente de traducción de audiencias. Lee las respuestas técnicas del Agente 3 y el perfil_objetivo.
+Celdas Originales Reemplazadas:
 
-Regla de Preservación: El System Prompt debe incluir una advertencia inquebrantable: "Bajo ninguna circunstancia debes eliminar o alterar las etiquetas de las fuentes (ej. 'Fuente: CHUNK 2'). Estas deben permanecer intactas en tu reescritura."
+Celda 2 (Configuración de entorno).
 
-Fase 5: Conexión del Grafo y Ejecución
+Celda 4 (Ingesta, conversión MarkItDown y gestión DuckDB).
 
-Enfoque de Programación:
-Una vez definidos los nodos, la construcción del grafo es una receta lineal. Por ahora, evita ciclos condicionales complejos (como enviar respuestas a corregir) hasta que el flujo base funcione.
+Celda 5 (Parcial: lógica TF-IDF desacoplada de herramientas específicas de LangChain).
 
-Instrucciones de Implementación:
+Archivo C: RAG.py (El Cerebro: LangGraph y Agentes)
 
-Instancia StateGraph usando tu esquema QAState.
+Función: Definir estrictamente la topología de la inteligencia artificial: el estado compartido, el comportamiento interno de los nodos (agentes) y las transiciones (aristas) que los unen. No debe encargarse de lectura de archivos ni configuraciones de rutas.
 
-Agrega los 4 nodos.
+Descripción Detallada:
 
-Define los "Edges" (bordes) conectándolos secuencialmente desde START hasta END.
+Define el esquema de datos tipado QAState que viaja entre los agentes.
 
-Compila el grafo.
+Contiene la función principal crear_grafo(llm, store, prompts_dir, params). Esta encapsulación es crítica: elimina la dependencia de variables globales, permitiendo que main.py inyecte el LLM, la conexión a la base de datos y los parámetros dinámicos de longitud/cantidad de forma segura.
 
-Ejecuta tu script inyectando el texto base y el perfil objetivo en el estado inicial, y finalmente exporta la llave cuestionario_final utilizando las funciones de escritura nativas de Python (open("ruta_en_d.md", "w")).
+Generación Dinámica de Esquemas: Reemplaza la restricción "dura" de 5 preguntas utilizando create_model de Pydantic, forzando al LLM a devolver una lista estructurada basada en el parámetro TOP_N_CONCEPTS.
 
-Anexo: Arquitectura del Sistema
+Inyección en Caliente: Modifica los prompts base al vuelo, utilizando .replace() para incrustar no solo el texto y los conceptos, sino también las reglas dinámicas de longitud ({q_len}, {a_len}) provenientes del disparador.
 
-El siguiente diagrama representa el flujo lógico del sistema descrito en este documento.
+Implementa los 4 nodos principales (agente_1_analista, agente_2_preguntas, agente_3_resolutor, agente_4_adaptador), incluyendo el uso de DuckDB en el nodo 3 para la recuperación de contexto (retrieve(pregunta, top_k)).
 
-graph TD
+Ensambla y compila el flujo lineal del StateGraph (START -> Nodo 1 -> Nodo 2 -> Nodo 3 -> Nodo 4 -> END).
 
-InputDoc((Entrada de Datos\nArchivo Origen)) --> Preprocesamiento
-InputPerfil((Entrada:\nPerfil Objetivo)) --> EstadoGlobal
+Celdas Originales Reemplazadas:
 
-subgraph Preprocesamiento [Fase 1: Preparación RAG]
-    Conversor[MarkItDown\nConvierte a .md]
-    DB[(DuckDB Vector Store\nAlmacenado en Disco D)]
-    Conversor --> DB
-end
+Celda 2.5 (Función cargar_prompt para leer los archivos Markdown).
 
-Preprocesamiento --> EstadoGlobal[(QAState\nMemoria Inmutable)]
+Celda 5 (Parcial: definición de QAState y certeza_contexto).
 
-subgraph Orquestacion [Fase Orquestación LangGraph]
-    A1[Agente 1: Analista TF-IDF]
-    A2[Agente 2: Generador Pydantic]
-    A3[Agente 3: Resolutor RAG]
-    A4[Agente 4: Adaptador Perfil]
-    
-    A1 -->|Extrae Conceptos| A2
-    A2 -->|Genera 5 Preguntas| A3
-    
-    A3 -->|Consulta Bucle| ToolB[(Tool: Búsqueda DuckDB)]
-    ToolB -.->|Devuelve Contexto Etiquetado| A3
-    
-    A3 -->|Respuestas Crudas + Citas| A4
-end
+Celda 7 (La lógica de los 4 agentes, ahora parametrizada).
 
-EstadoGlobal -.-> Orquestacion
-Orquestacion -.-> EstadoGlobal
+Celda 8 (La construcción del StateGraph).
 
-A4 --> Salida((Exportación\nCuestionario .md\nGuardado en Disco D))
+3. Flujo de Ejecución (End-to-End)
+
+Para entender cómo estos archivos trabajan en conjunto, este es el ciclo de vida completo de una solicitud en la fase Beta:
+
+El usuario ejecuta bash sh/lanzar_beta.sh.
+
+El script de bash carga en la memoria temporal los parámetros deseados (ej. 5 preguntas, perfil de estudiante universitario, el archivo PDF a leer) e invoca python main.py con estos valores.
+
+main.py atrapa los argumentos, calcula las rutas de lectura/escritura y le pide a utils.py que configure el entorno, convierta el PDF a Markdown en outputs/processed/ y levante la base de datos DuckDB.
+
+main.py inicializa el cliente de Ollama y le pasa todas las piezas (el modelo, la conexión a la BD, la ruta a las plantillas y los parámetros) a la función crear_grafo de RAG.py.
+
+RAG.py ensambla la estructura de agentes. Se inyecta el estado inicial (el texto procesado) y arranca el grafo.
+
+Agente 1: Usa utils.extraer_conceptos_tfidf con el top_n solicitado.
+
+Agente 2: Modifica el prompt con {q_len} y genera preguntas usando Pydantic dinámico.
+
+Agente 3: Consulta la BD vectorial (top_k) y le pide a Ollama que responda respetando el {a_len}.
+
+Agente 4: Formatea las respuestas crudas según el perfil objetivo.
+
+El grafo termina y devuelve el QAState final a main.py.
+
+main.py extrae el cuestionario_final del estado y lo guarda como un archivo Markdown limpio en la carpeta outputs/.
