@@ -252,19 +252,31 @@ class QnAGuiApp(ctk.CTk):
             self._log(f" Preguntas: {top_n}")
             self._log(f"=============================================\n")
 
-            # 2. Ejecutar Python/main.py
-            cmd = [
-                sys.executable,
-                str(self.project_dir / "Python" / "main.py"),
-                "--input", input_filename,
-                "--perfil", profile,
-                "--modelo", model,
-                "--top_n", str(top_n)
-            ]
+            # 2. Ejecutar a través de los scripts sh/ (.sh o .ps1) según OS
+            if sys.platform == "win32":
+                script_path = self.project_dir / "sh" / "lanzar_beta.ps1"
+                cmd = [
+                    "powershell",
+                    "-ExecutionPolicy", "Bypass",
+                    "-File", str(script_path),
+                    "-InputFile", input_filename,
+                    "-Perfil", profile,
+                    "-Modelo", model,
+                    "-TopN", str(top_n)
+                ]
+            else:
+                script_path = self.project_dir / "sh" / "lanzar_beta.sh"
+                cmd = [
+                    "bash",
+                    str(script_path),
+                    input_filename,
+                    profile,
+                    model,
+                    str(top_n)
+                ]
 
             env = os.environ.copy()
             env["PYTHONUNBUFFERED"] = "1"
-            env["PYTHONPATH"] = str(self.project_dir / "python") + ":" + str(self.project_dir / "Python")
 
             process = subprocess.Popen(
                 cmd,

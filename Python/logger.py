@@ -1,12 +1,12 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict
 
-# Nos aseguramos de que datetime tenga UTC por si acaso
+# Polyfill para compatibilidad con versiones antiguas
 if not hasattr(datetime, "UTC"):
-    datetime.UTC = datetime.timezone.utc
+    datetime.UTC = timezone.utc
 
 class RAGLogger:
     def __init__(self, outputs_dir: Path):

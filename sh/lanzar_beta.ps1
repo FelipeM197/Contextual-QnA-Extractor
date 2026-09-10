@@ -2,17 +2,24 @@
 # Disparador Beta del Sistema QnA (PowerShell nativo para Windows)
 # ==============================================================================
 
+param(
+    [string]$InputFile = "Informe Proyecto Bim 1 EDAII.pdf",
+    [string]$Perfil = "estudiante universitario",
+    [string]$Modelo = "llama3.1",
+    [int]$TopN = 5
+)
+
 $ENV_CODE = "010"
-$INPUT_FILE = "Informe Proyecto Bim 1 EDAII.pdf"
+$INPUT_FILE = $InputFile
 $ENCODING = "utf-8"
 
-$TARGET_PROFILE = "estudiante universitario"
-$TOP_N_CONCEPTS = 5
+$TARGET_PROFILE = $Perfil
+$TOP_N_CONCEPTS = $TopN
 
 $QUESTION_LENGTH = "concisas y directas, máximo 15 palabras"
 $ANSWER_LENGTH = "detalladas y analíticas, de al menos dos párrafos"
 
-$MODEL_NAME = "llama3.1"
+$MODEL_NAME = $Modelo
 $TEMPERATURE = 0
 $EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 $TOP_K_CHUNKS = 3

@@ -84,10 +84,20 @@ streamlit run Python/web_app.py
 ```
 
 ### 2. Interfaz de Escritorio (GUI)
-Inicia la aplicación de escritorio nativa CustomTkinter.
+Inicia la aplicación de escritorio nativa CustomTkinter. Esta interfaz se comunica directamente con los scripts `sh/lanzar_beta` para ejecutar el backend, cumpliendo con los requisitos de integración.
+
 ```bash
 python Python/gui_app.py
 ```
+
+**Tutorial de Uso (GUI):**
+1. Ejecuta el comando anterior en tu terminal. Se abrirá una ventana oscura.
+2. Haz clic en el botón azul **"📁 Buscar Archivo"** y selecciona tu documento (ej. PDF o TXT).
+3. En la sección "Parámetros del Sistema", selecciona el **Perfil del Evaluado** (ej. estudiante universitario).
+4. Selecciona el **Modelo Ollama LLM** que tienes descargado (ej. `llama3.1` o `gemma4:e2b`).
+5. Elige el **Número de Preguntas** a generar.
+6. Presiona el botón verde **"🚀 GENERAR CUESTIONARIO"**.
+7. Observa la consola de salida a la derecha para ver en tiempo real cómo los Agentes extraen conceptos y redactan las preguntas. Al finalizar, haz clic en **"📂 Abrir Carpeta de Logs"** para ver tu Markdown generado.
 
 ### 3. Interfaz de Línea de Comandos (CLI)
 Para ejecución sin interfaz gráfica o integración en scripts.
