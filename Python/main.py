@@ -47,7 +47,7 @@ def main():
     # 1. Configurar Entorno
     utils.configurar_entorno()
     
-    # Normalización de ruta base para ejecuciones indistintas desde repo root, sh/ o Python/
+    # Normalize base path to support arbitrary execution contexts (repo root, sh/, or Python/).
     project_dir = Path.cwd().resolve()
     if project_dir.name == "Python":
         project_dir = project_dir.parent
@@ -63,13 +63,13 @@ def main():
     logs_dir.mkdir(parents=True, exist_ok=True)
     prompts_dir.mkdir(parents=True, exist_ok=True)
     
-    # Inicializar el logger global
     init_logger(outputs_dir)
     
     input_file_path = inputs_dir / args.input
     if not input_file_path.exists():
         print(f"Error: No se encontró el archivo de entrada en {input_file_path}")
-        # Migración retrocompatible transparente si el archivo quedó en la ruta heredada del notebook
+        
+        # Transparent backwards compatibility for legacy data/input structure.
         old_input = project_dir / "data" / "input" / args.input
         if old_input.exists():
             print(f"Moviendo {args.input} desde data/input hacia inputs/...")
@@ -82,11 +82,10 @@ def main():
     db_path = processed_dir / f"{base_name}.db"
     cuestionario_path = logs_dir / f"cuestionario_{base_name}.md"
     
-    # 2. Conversión e Ingesta Vectorial
     utils.convertir_a_markdown(input_file_path, markdown_path)
     store = utils.abrir_o_crear_store(markdown_path, db_path, args.embedding)
     
-    # 3. Preparación de Ollama (conmutación defensiva a fallback si el demonio no responde)
+    # Defensive fallback if the Ollama daemon is unreachable or missing weights.
     ollama_dir = os.environ.get("OLLAMA_MODELS", "")
     if modelo_disponible(args.modelo, ollama_dir):
         llm = ChatOllama(model=args.modelo, temperature=args.temperatura)
@@ -95,7 +94,7 @@ def main():
         llm = None
         print(f"[Main] Modelo {args.modelo} no disponible. Usando modo fallback.")
         
-    # 4. Desacoplamiento de hiperparámetros hacia el grafo RAG
+    # Decouple CLI parameters from LangGraph node implementations.
     params = {
         "top_n": args.top_n,
         "top_k": args.top_k,
@@ -106,7 +105,7 @@ def main():
     
     grafo = RAG.crear_grafo(llm, store, prompts_dir, params)
     
-    # 5. Ejecutar Grafo con el estado mínimo requerido por Agente 1
+    # Initial graph state injection required by Agent 1.
     transcripcion = markdown_path.read_text(encoding="utf-8")
     initial_state = {
         "transcripcion_original": transcripcion,
@@ -116,7 +115,6 @@ def main():
     print(f"\n[Main] Iniciando flujo RAG para perfil: {args.perfil}")
     result = grafo.invoke(initial_state)
     
-    # 6. Guardar Resultados finales
     cuestionario_path.write_text(result["cuestionario_final"], encoding="utf-8")
     print(f"\n[Main] Proceso terminado. Archivo generado en: {cuestionario_path}")
 

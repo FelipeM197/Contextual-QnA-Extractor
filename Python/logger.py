@@ -4,38 +4,31 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict
 
-# Polyfill para compatibilidad con versiones antiguas
-if not hasattr(datetime, "UTC"):
-    datetime.UTC = timezone.utc
-
 class RAGLogger:
     def __init__(self, outputs_dir: Path):
         self.logs_dir = outputs_dir / "logs"
         self.logs_dir.mkdir(parents=True, exist_ok=True)
         
-        timestamp = datetime.now(datetime.UTC).strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         self.log_file_jsonl = self.logs_dir / "dataset_training.jsonl"
         self.log_file_txt = self.logs_dir / "dataset_training.log"
         
-        # Escribimos un evento de inicio
         self.log_event("system_start", {"timestamp": timestamp})
         print(f"[Logger] Inicializado: {self.log_file_txt} y .jsonl")
 
     def log_event(self, event_type: str, data: Dict[str, Any]):
-        """Escribe un evento en formato JSONL."""
         log_entry = {
-            "timestamp": datetime.now(datetime.UTC).isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "event": event_type,
             "data": data
         }
         
         json_line = json.dumps(log_entry, ensure_ascii=False) + "\n"
         
-        # Guardar como JSONL estricto
+        # Dual-write for ML pipelines (JSONL) and manual auditing (.log).
         with open(self.log_file_jsonl, "a", encoding="utf-8") as f:
             f.write(json_line)
             
-        # Guardar como LOG legible
         with open(self.log_file_txt, "a", encoding="utf-8") as f:
             f.write(f"[{log_entry['timestamp']}] EVENT: {event_type}\n")
             f.write(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
@@ -54,7 +47,6 @@ class RAGLogger:
             "parsed_response": parsed_response
         })
 
-# Instancia global que inicializaremos desde main.py
 _logger = None
 
 def init_logger(outputs_dir: Path) -> RAGLogger:
@@ -65,5 +57,5 @@ def init_logger(outputs_dir: Path) -> RAGLogger:
 def get_logger() -> RAGLogger:
     global _logger
     if _logger is None:
-        raise ValueError("El logger no ha sido inicializado. Llama a init_logger() primero.")
+        raise ValueError("Logger no inicializado. Se requiere llamada previa a init_logger().")
     return _logger

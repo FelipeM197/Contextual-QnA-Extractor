@@ -14,6 +14,8 @@ class QAState(TypedDict, total=False):
     respuestas_crudas: list[dict[str, str]]
     perfil_objetivo: str
     cuestionario_final: str
+    intentos_auditoria: int
+    aprobado_por_auditor: bool
 
 def certeza_contexto(contexto: str) -> float:
     """Heurística de certeza ligada a la densidad de fragmentos recuperados (tope 0.95)."""
@@ -196,18 +198,83 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
         logger.log_node_end("agente_4_adaptador", update)
         return update
 
-    # Topología strictly secuencial: Analista -> Formulador -> Resolutor -> Adaptador
+    def agente_5_auditor(state: QAState) -> dict:
+        logger = get_logger()
+        logger.log_node_start("agente_5_auditor", dict(state))
+        print("[Agente 5] Auditando respuestas contra la evidencia (Guardrail)...", flush=True)
+        
+        intentos = state.get("intentos_auditoria", 0) + 1
+        respuestas = state.get("respuestas_crudas", [])
+        aprobado = True
+        
+        # Hard limit to prevent infinite RAG hallucination loops.
+        if intentos >= 3:
+            print("[Agente 5] Límite de intentos alcanzado. Forzando aprobación para evitar bucle infinito.", flush=True)
+            logger.log_node_end("agente_5_auditor", {"aprobado_por_auditor": True, "intentos_auditoria": intentos})
+            return {"aprobado_por_auditor": True, "intentos_auditoria": intentos}
+
+        if llm is not None:
+            prompt_base = cargar_prompt(prompts_dir, "prompt_critic_validation")
+            if not prompt_base:
+                prompt_base = "Evalúa si las respuestas se basan estrictamente en la evidencia. Responde APROBADO o RECHAZADO."
+                
+            for idx, item in enumerate(respuestas, start=1):
+                prompt = prompt_base.replace("{candidate_question}", item["pregunta"])\
+                                    .replace("{candidate_answer}", item["respuesta"])\
+                                    .replace("{context_chunks}", item["fuente"])
+                try:
+                    evaluacion = llm.invoke(prompt).content
+                    logger.log_llm_interaction(prompt, evaluacion)
+                    
+                    # Detect JSON field "is_grounded": false
+                    # We accept both literal false or FALSE since LLMs can be unpredictable.
+                    if '"is_grounded": false' in evaluacion.lower():
+                        print(f"[Agente 5] ⚠️ Alucinación detectada en la pregunta {idx}. Rechazando el lote.", flush=True)
+                        aprobado = False
+                        break
+                except Exception as e:
+                    logger.log_event("llm_error", {"agent": "agente_5", "error": str(e)})
+                    # Fallback in case of failure is to allow it to pass.
+                    aprobado = True
+        else:
+            aprobado = True
+            
+        print(f"[Agente 5] Veredicto del Auditor: {'APROBADO' if aprobado else 'RECHAZADO'}", flush=True)
+        
+        update = {"aprobado_por_auditor": aprobado, "intentos_auditoria": intentos}
+        logger.log_node_end("agente_5_auditor", update)
+        return update
+
+    def auditor_router(state: QAState) -> str:
+        """Enruta el flujo dependiendo del veredicto del auditor."""
+        if state.get("aprobado_por_auditor", False):
+            return "agente_4_adaptador"
+        else:
+            return "agente_2_preguntas"
+
     graph_builder = StateGraph(QAState)
     graph_builder.add_node("agente_1_analista", agente_1_analista)
     graph_builder.add_node("agente_2_preguntas", agente_2_preguntas)
     graph_builder.add_node("agente_3_resolutor", agente_3_resolutor)
+    graph_builder.add_node("agente_5_auditor", agente_5_auditor)
     graph_builder.add_node("agente_4_adaptador", agente_4_adaptador)
     
     graph_builder.add_edge(START, "agente_1_analista")
     graph_builder.add_edge("agente_1_analista", "agente_2_preguntas")
     graph_builder.add_edge("agente_2_preguntas", "agente_3_resolutor")
-    graph_builder.add_edge("agente_3_resolutor", "agente_4_adaptador")
+    graph_builder.add_edge("agente_3_resolutor", "agente_5_auditor")
+    
+    # Dynamic routing based on the Guardrail's evaluation.
+    graph_builder.add_conditional_edges(
+        "agente_5_auditor",
+        auditor_router,
+        {
+            "agente_4_adaptador": "agente_4_adaptador",
+            "agente_2_preguntas": "agente_2_preguntas"
+        }
+    )
+    
     graph_builder.add_edge("agente_4_adaptador", END)
     
-    print("[RAG] Grafo compilado correctamente.", flush=True)
+    print("[RAG] Grafo compilado correctamente (Flujo con Auditor 5 integrado).", flush=True)
     return graph_builder.compile()

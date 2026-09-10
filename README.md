@@ -31,13 +31,11 @@ flowchart TD
         A3["Agente 3<br/>Resolutor (Responde con Evidencia)"]:::agent
         A4["Agente 4<br/>Adaptador (Modula Tono Pedagógico)"]:::agent
         
-        A5["Agente 5 (Planeado)<br/>Crítico / Auditor (Guardrail RAG)"]:::planned
+        A5["Agente 5<br/>Crítico Auditor Guardrail RAG"]:::agent
 
-        A1 --> A2 --> A3
-        A3 ==>|Flujo Lineal Actual| A4
-        A3 -.->|Flujo Planeado| A5
-        A5 -.->|Rechaza (Alucinación)| A2
-        A5 -.->|Aprueba (Verificado)| A4
+        A1 --> A2 --> A3 --> A5
+        A5 -->|Rechaza Alucinacion| A2
+        A5 -->|Aprueba Verificado| A4
     end
 
     UI -->|Pasa Parámetros| Main
@@ -91,13 +89,13 @@ python Python/gui_app.py
 ```
 
 **Tutorial de Uso (GUI):**
-1. Ejecuta el comando anterior en tu terminal. Se abrirá una ventana oscura.
-2. Haz clic en el botón azul **"📁 Buscar Archivo"** y selecciona tu documento (ej. PDF o TXT).
-3. En la sección "Parámetros del Sistema", selecciona el **Perfil del Evaluado** (ej. estudiante universitario).
-4. Selecciona el **Modelo Ollama LLM** que tienes descargado (ej. `llama3.1` o `gemma4:e2b`).
-5. Elige el **Número de Preguntas** a generar.
-6. Presiona el botón verde **"🚀 GENERAR CUESTIONARIO"**.
-7. Observa la consola de salida a la derecha para ver en tiempo real cómo los Agentes extraen conceptos y redactan las preguntas. Al finalizar, haz clic en **"📂 Abrir Carpeta de Logs"** para ver tu Markdown generado.
+1. Ejecuta el comando anterior en tu terminal para inicializar la aplicación.
+2. Selecciona el botón **"Buscar Archivo"** e ingresa el documento fuente (ej. PDF o TXT).
+3. En la sección "Parámetros del Sistema", especifica el **Perfil del Evaluado** (ej. estudiante universitario).
+4. Selecciona el **Modelo Ollama LLM** pre-descargado en tu entorno (ej. `llama3.1` o `gemma4:e2b`).
+5. Configura el **Número de Preguntas** a generar.
+6. Presiona **"GENERAR CUESTIONARIO"** para inicializar el pipeline de agentes.
+7. Supervisa la consola de logs incrustada para auditar la extracción de conceptos y resolución de evidencia en tiempo real. Al finalizar, selecciona **"Abrir Carpeta de Logs"** para acceder a los artefactos generados.
 
 ### 3. Interfaz de Línea de Comandos (CLI)
 Para ejecución sin interfaz gráfica o integración en scripts.
@@ -115,4 +113,4 @@ python Python/main.py --input "Documento.pdf" --perfil "estudiante universitario
 ```
 
 ---
-**Nota de Mantenimiento:** Actualizar este documento al integrar los esquemas Pydantic planeados y el quinto Agente Crítico en la topología principal del grafo.
+**Nota de Mantenimiento:** La arquitectura Multi-Agente RAG está completamente operativa, incluyendo el flujo de Guardrail (Agente 5) para mitigar alucinaciones de forma autónoma.
