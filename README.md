@@ -1,10 +1,10 @@
-# ⚡ Contextual QnA Extractor
+# Contextual QnA Extractor
 
-Un generador RAG Multi-Agente basado en **Ollama** y **LangGraph**. Este sistema es capaz de ingerir documentos (PDF, Word, Markdown, texto plano, imágenes) y generar de forma autónoma cuestionarios adaptados a diferentes perfiles (universitario, técnico, principiante) preservando el rigor y trazabilidad de las fuentes.
+Sistema RAG (Retrieval-Augmented Generation) multi-agente construido sobre Ollama y LangGraph. Ingiere documentos en diversos formatos (PDF, Word, Markdown, texto plano, imágenes) y genera cuestionarios contextuales adaptados a perfiles de audiencia específicos (ej. estudiante universitario, técnico, principiante), preservando estrictamente la trazabilidad de las fuentes.
 
-## 🧠 Arquitectura del Proyecto
+## Arquitectura del Sistema
 
-El proyecto está diseñado de forma modular, separando la orquestación, las herramientas de ingesta, y el cerebro del sistema.
+La arquitectura aísla la orquestación, la ingesta de datos y el flujo de agentes para facilitar la escalabilidad y las pruebas.
 
 ```mermaid
 flowchart TD
@@ -14,24 +14,24 @@ flowchart TD
     classDef planned fill:#F59E0B,stroke:#fff,stroke-width:2px,color:#fff,stroke-dasharray: 5 5,font-weight:bold
     classDef data fill:#475569,stroke:#fff,stroke-width:2px,color:#fff,font-weight:bold
 
-    UI["🖥️ Interfaces de Usuario<br/>(Web, Escritorio, Consola)"]:::ui
-    Main["⚙️ Controlador Backend<br/>(Prepara entorno y configuración)"]:::core
+    UI["Interfaces de Usuario<br/>(Web, Escritorio, CLI)"]:::ui
+    Main["Controlador Backend<br/>(Entorno y Configuración)"]:::core
 
-    subgraph Data ["🗂️ Almacenamiento y Datos"]
+    subgraph Data ["Capa de Almacenamiento y Datos"]
         direction LR
-        Inputs[/"📄 Entradas<br/>(PDFs, Documentos)"/]:::data
-        VectorDB[("🗄️ DuckDB<br/>(Base Vectorial)")]:::data
-        Outputs[/"📝 Salidas<br/>(Cuestionarios y Logs)"/]:::data
+        Inputs[/"Entradas Crudas<br/>(PDFs, Documentos)"/]:::data
+        VectorDB[("DuckDB<br/>(Base Vectorial)")]:::data
+        Outputs[/"Salidas<br/>(Cuestionarios y Logs)"/]:::data
     end
 
-    subgraph Agents ["🧠 Cerebro del Sistema (LangGraph)"]
+    subgraph Agents ["Pipeline de Agentes LangGraph"]
         direction TB
         A1["Agente 1<br/>Analista (Extrae Conceptos)"]:::agent
         A2["Agente 2<br/>Generador (Formula Preguntas)"]:::agent
         A3["Agente 3<br/>Resolutor (Responde con Evidencia)"]:::agent
         A4["Agente 4<br/>Adaptador (Modula Tono Pedagógico)"]:::agent
         
-        A5["Agente 5 (Planeado)<br/>Crítico / Auditor (RAG Guardrail)"]:::planned
+        A5["Agente 5 (Planeado)<br/>Crítico / Auditor (Guardrail RAG)"]:::planned
 
         A1 --> A2 --> A3
         A3 ==>|Flujo Lineal Actual| A4
@@ -43,69 +43,66 @@ flowchart TD
     UI -->|Pasa Parámetros| Main
     Main -->|Ingesta Documentos| Inputs
     Inputs -->|Indexa Chunks| VectorDB
-    Main -->|Dispara Grafo| A1
+    Main -->|Inicia Grafo| A1
     
     A3 <-->|Recupera Contexto| VectorDB
-    A4 -->|Guarda Resultado| Outputs
+    A4 -->|Persiste Resultado| Outputs
 ```
 
-## 📂 Estructura del Repositorio
+## Estructura del Repositorio
 
-- `inputs/`: Documentos originales que se procesan.
+- `inputs/`: Directorio para documentos fuente crudos.
 - `outputs/`: 
-  - `processed/`: Textos convertidos a Markdown y la base de datos vectorial (DuckDB).
-  - `cuestionarios-logs/`: Entregables finales (Markdown) y logs de ejecución.
-- `prompts/`: Instrucciones puras en Markdown que controlan el comportamiento de los Agentes.
-- `Python/`: Núcleo de la arquitectura modular (Controlador, esquemas, herramientas RAG, agentes y grafos), e interfaces (gui_app.py y web_app.py).
-- `sh/`: Scripts de inicialización por consola (`bash` y `powershell`).
-- `docs/`: Documentación del proyecto (planes y guías).
+  - `processed/`: Conversiones Markdown y la base de datos vectorial DuckDB.
+  - `cuestionarios-logs/`: Cuestionarios finales generados en Markdown y registros de ejecución.
+- `prompts/`: Plantillas de texto plano que dictan el comportamiento de los agentes. Desacopladas del código fuente para permitir ajustes sin modificar la lógica.
+- `Python/`: Arquitectura modular central que contiene el controlador, esquemas, herramientas RAG, agentes, lógica del grafo y puntos de entrada de la interfaz de usuario (`gui_app.py`, `web_app.py`).
+- `sh/`: Scripts de inicialización (`bash` y `powershell`) para ejecución vía CLI.
+- `docs/`: Documentación del sistema y planes arquitectónicos.
 
-## 📊 Registro de Ejecución (Logs para Entrenamiento)
+## Registro de Ejecución (Datos de Entrenamiento)
 
-Con el fin de auditar el sistema y recopilar datos masivos para el futuro entrenamiento (Fine-Tuning) de modelos propios, el sistema captura el "pensamiento" completo de la IA en cada ejecución (prompts exactos, respuestas crudas, contextos y errores). 
+Para soportar el futuro fine-tuning de modelos y la depuración del sistema, se captura el estado completo de ejecución del LLM (prompts exactos, respuestas crudas, contextos y errores) en todas las ejecuciones.
 
-Estos datos se guardan centralizados en dos mega-archivos dentro de `outputs/logs/`:
-- **`dataset_training.log`**: Un archivo de texto estructurado y legible por humanos. Muestra cada evento separado de forma visual y clara, ideal para revisar manualmente el razonamiento de los Agentes paso a paso.
-- **`dataset_training.jsonl`**: Contiene exactamente la misma información pero en formato *JSON Lines*. Este formato es el estándar de la industria para ingestar y entrenar modelos directamente mediante librerías como HuggingFace o la API de OpenAI.
+Los registros se centralizan en `outputs/logs/`:
+- `dataset_training.log`: Archivo de texto estructurado legible por humanos. Útil para la auditoría manual de los pasos de razonamiento de los agentes.
+- `dataset_training.jsonl`: Formato estricto JSON Lines con datos idénticos. Formato estándar para ingesta directa en pipelines de entrenamiento de ML (ej. HuggingFace datasets, OpenAI fine-tuning).
 
-## 🚀 Requisitos Previos
+## Requisitos Previos
 
-1. **Entorno Python**: Asegúrate de usar el entorno con las dependencias instaladas (ej. `conda activate QAG_System`).
-2. **Ollama**: Necesitas tener [Ollama](https://ollama.com/) instalado y corriendo localmente, junto con los modelos necesarios descargados (por ejemplo: `llama3.1`, `gemma2`, `mistral`, `gemma4:e2b`).
-3. **Dependencias**: Instalar las librerías desde los archivos de requirements de la raíz.
+1. **Entorno Python**: Asegurar que el entorno local esté activo y las dependencias instaladas (`pip install -r requirements.txt`).
+2. **Ollama**: Una instancia local de [Ollama](https://ollama.com/) debe estar en ejecución con los modelos requeridos descargados (ej. `llama3.1`, `gemma2`, `mistral`, `gemma4:e2b`).
 
-## ⚙️ Cómo Ejecutar el Sistema
+## Métodos de Ejecución
 
-El sistema ofrece tres vías de ejecución según la preferencia del usuario. Todas ellas se ejecutan desde la raíz del proyecto.
+Todos los comandos deben ejecutarse desde el directorio raíz del proyecto.
 
-### 1. Interfaz Web (Recomendado)
-Para interactuar con la aplicación en tu navegador de manera visual e intuitiva:
+### 1. Interfaz Web
+Inicia la aplicación web Streamlit.
 ```bash
 streamlit run Python/web_app.py
 ```
-*Te permitirá subir archivos arrastrando y soltando, y visualizar el Cuestionario resultante en pantalla.*
 
 ### 2. Interfaz de Escritorio (GUI)
-Si prefieres una aplicación de escritorio nativa instalada localmente:
+Inicia la aplicación de escritorio nativa CustomTkinter.
 ```bash
 python Python/gui_app.py
 ```
 
-### 3. Vía Consola (Scripts y CLI)
-Para integraciones rápidas sin interfaz gráfica:
-```bash
-# Vía shell script:
-bash sh/lanzar_beta.sh
+### 3. Interfaz de Línea de Comandos (CLI)
+Para ejecución sin interfaz gráfica o integración en scripts.
 
-# Vía PowerShell:
+Mediante scripts shell:
+```bash
+bash sh/lanzar_beta.sh
+# o
 .\sh\lanzar_beta.ps1
 ```
 
-O llamando directamente al núcleo de Python pasándole los parámetros deseados:
+Mediante el controlador Python directo:
 ```bash
-python Python/main.py --input "Mi_Documento.pdf" --perfil "estudiante universitario" --modelo "llama3.1" --top_n 5
+python Python/main.py --input "Documento.pdf" --perfil "estudiante universitario" --modelo "llama3.1" --top_n 5
 ```
 
 ---
-> **Nota de Mantenimiento:**  
-> Este `README.md` deberá actualizarse progresivamente conforme se integren la nueva arquitectura en transición, los esquemas Pydantic y el 5to Agente Auditor planeado en el grafo principal.
+**Nota de Mantenimiento:** Actualizar este documento al integrar los esquemas Pydantic planeados y el quinto Agente Crítico en la topología principal del grafo.
