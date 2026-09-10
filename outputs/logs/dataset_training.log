@@ -852,3 +852,207 @@
   "cuestionario_final": "# Cuestionario adaptado para estudiante universitario\n\n## 1. ¿Cuál es el objetivo principal de la implementación de un Grafo Dirigido Acíclico (DAG) para automatizar la validación de prerrequisitos en una malla curricular universitaria?\n\nLa implementación de un Grafo Dirigido Acíclico (DAG) tiene como objetivo principal automatizar la validación de prerrequisitos en una malla curricular universitaria, lo que permite a los estudiantes encontrar rutas viables de estudio y previene errores en la planificación académica.\n\nFuente: CHUNK 1 y CHUNK 2\n\n## 2. ¿Cuáles son las ventajas de utilizar el paradigma de Programación Orientada a Objetos (POO) en la implementación del sistema de validación de prerrequisitos?\n\nLa implementación del sistema de validación de prerrequisitos mediante el paradigma de Programación Orientada a Objetos (POO) ofrece varias ventajas. En primer lugar, permite un control estricto mediante encapsulamiento, lo que facilita mantener la lógica algorítmica separada y limpia, permitiendo su fácil integración con librerías externas de visualización como NetworkX. Además, el uso de POO permite la creación de un Tipo de Dato Abstracto (ADT) que encapsula la lógica del sistema, lo que facilita su mantenimiento y escalabilidad.\n\nAdemás, la implementación de POO permite la creación de clases que encapsulan la lógica del sistema, lo que facilita su reutilización y modificación. Esto se refleja en la implementación del sistema, donde se crean clases como Grafo, Nodo y Arista que encapsulan la lógica del sistema, lo que facilita su mantenimiento y escalabilidad.\n\nEn resumen, el uso del paradigma de POO en la implementación del sistema de validación de prerrequisitos ofrece varias ventajas, como control estricto, encapsulamiento, reutilización y modificación de la lógica del sistema.\n\nFuente: CHUNK 3\n\n## 3. ¿Cuál es el algoritmo utilizado para trazar rutas óptimas en el sistema de validación de prerrequisitos y por qué es más adecuado que otros algoritmos?\n\nEl algoritmo utilizado para trazar rutas óptimas en el sistema de validación de prerrequisitos es el Breadth-First Search (BFS). Esto se debe a que BFS es una herramienta indispensable para trazar rutas óptimas empleando colas, lo que permite encontrar los caminos más cortos entre dos nodos en un grafo.\n\nFuente: CHUNK 3\n\n## 4. ¿Cómo se integra la herramienta de visualización NetworkX con el sistema de validación de prerrequisitos para proporcionar una representación visual de la malla curricular?\n\nLa herramienta de visualización NetworkX se integra con el sistema de validación de prerrequisitos mediante la función de visualización del sistema. Esto se logra mediante la integración de los parámetros de escalado y diseño sugeridos para NetworkX dentro de la función de visualización del sistema, como se menciona en el CHUNK 4.\n\nAdemás, se menciona que se ajustaron los scripts de generación de grafo para que tengan características visuales, lo que sugiere que la herramienta de visualización NetworkX se utiliza para representar la malla curricular de manera visual.\n\nFuente: CHUNK 4\n\n## 5. ¿Qué papel juega la herramienta Gemini en la elaboración del informe y qué tareas específicas se le asignaron a la herramienta?\n\nLa herramienta Gemini se utilizó en la elaboración del informe para realizar varias tareas específicas. Según el contexto, se le asignaron las siguientes tareas a la herramienta Gemini:\n\n1. Revisión y mejora de redacción: Se le pidió a la herramienta que \"Mejorara la redacción de este punto\" y que \"Revisara la ortografía y gramática...\" (Fuente: CHUNK 2).\n2. Asistencia pedagógica en código: Se le pidió a la herramienta que \"Enseñara cómo llegar a implementar\" una idea de código y que \"Validara el código\" (Fuente: CHUNK 2).\n3. Ajustes de visualización: Se le pidió a la herramienta que \"Ajustara el siguiente script de generación de grafo\" para que tenga características visuales específicas (Fuente: CHUNK 2).\n4. Conversión de estructura de datos: Se le pidió a la herramienta que \"Conviertiera\" un documento en un archivo JSON (Fuente: CHUNK 2).\n5. Validación de documentación: Se le pidió a la herramienta que \"Validara que el informe sea completo según la rúbrica\" y que agregara secciones y tablas faltantes (Fuente: CHUNK 2).\n\nEn resumen, la herramienta Gemini se utilizó para realizar tareas de revisión, asistencia pedagógica, ajustes de visualización, conversión de estructura de datos y validación de documentación en la elaboración del informe.\n\nFuente: CHUNK 2"
 }
 --------------------------------------------------
+[2026-09-10T15:29:25.218864+00:00] EVENT: system_start
+{
+  "timestamp": "20260910_152925"
+}
+--------------------------------------------------
+[2026-09-10T15:32:33.363801+00:00] EVENT: node_start_agente_1_analista
+{
+  "transcripcion_original": "La fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n",
+  "perfil_objetivo": "estudiante universitario"
+}
+--------------------------------------------------
+[2026-09-10T15:32:33.372915+00:00] EVENT: node_end_agente_1_analista
+{
+  "conceptos_clave": [
+    "energía",
+    "acción",
+    "agua",
+    "carbono",
+    "clorofila"
+  ]
+}
+--------------------------------------------------
+[2026-09-10T15:32:33.376593+00:00] EVENT: node_start_agente_2_preguntas
+{
+  "transcripcion_original": "La fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n",
+  "conceptos_clave": [
+    "energía",
+    "acción",
+    "agua",
+    "carbono",
+    "clorofila"
+  ],
+  "perfil_objetivo": "estudiante universitario"
+}
+--------------------------------------------------
+[2026-09-10T15:32:33.379044+00:00] EVENT: node_end_agente_2_preguntas
+{
+  "preguntas_generadas": [
+    "¿Qué explica el documento sobre energía?",
+    "¿Qué explica el documento sobre acción?",
+    "¿Qué explica el documento sobre agua?",
+    "¿Qué explica el documento sobre carbono?",
+    "¿Qué explica el documento sobre clorofila?"
+  ]
+}
+--------------------------------------------------
+[2026-09-10T15:32:33.381940+00:00] EVENT: node_start_agente_3_resolutor
+{
+  "transcripcion_original": "La fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n",
+  "conceptos_clave": [
+    "energía",
+    "acción",
+    "agua",
+    "carbono",
+    "clorofila"
+  ],
+  "preguntas_generadas": [
+    "¿Qué explica el documento sobre energía?",
+    "¿Qué explica el documento sobre acción?",
+    "¿Qué explica el documento sobre agua?",
+    "¿Qué explica el documento sobre carbono?",
+    "¿Qué explica el documento sobre clorofila?"
+  ],
+  "perfil_objetivo": "estudiante universitario"
+}
+--------------------------------------------------
+[2026-09-10T15:32:34.239066+00:00] EVENT: node_end_agente_3_resolutor
+{
+  "respuestas_crudas": [
+    {
+      "pregunta": "¿Qué explica el documento sobre energía?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    },
+    {
+      "pregunta": "¿Qué explica el documento sobre acción?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    },
+    {
+      "pregunta": "¿Qué explica el documento sobre agua?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    },
+    {
+      "pregunta": "¿Qué explica el documento sobre carbono?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    },
+    {
+      "pregunta": "¿Qué explica el documento sobre clorofila?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    }
+  ]
+}
+--------------------------------------------------
+[2026-09-10T15:32:34.242701+00:00] EVENT: node_start_agente_5_auditor
+{
+  "transcripcion_original": "La fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n",
+  "conceptos_clave": [
+    "energía",
+    "acción",
+    "agua",
+    "carbono",
+    "clorofila"
+  ],
+  "preguntas_generadas": [
+    "¿Qué explica el documento sobre energía?",
+    "¿Qué explica el documento sobre acción?",
+    "¿Qué explica el documento sobre agua?",
+    "¿Qué explica el documento sobre carbono?",
+    "¿Qué explica el documento sobre clorofila?"
+  ],
+  "respuestas_crudas": [
+    {
+      "pregunta": "¿Qué explica el documento sobre energía?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    },
+    {
+      "pregunta": "¿Qué explica el documento sobre acción?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    },
+    {
+      "pregunta": "¿Qué explica el documento sobre agua?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    },
+    {
+      "pregunta": "¿Qué explica el documento sobre carbono?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    },
+    {
+      "pregunta": "¿Qué explica el documento sobre clorofila?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    }
+  ],
+  "perfil_objetivo": "estudiante universitario"
+}
+--------------------------------------------------
+[2026-09-10T15:32:34.245027+00:00] EVENT: node_end_agente_5_auditor
+{
+  "aprobado_por_auditor": true,
+  "intentos_auditoria": 1
+}
+--------------------------------------------------
+[2026-09-10T15:32:34.247944+00:00] EVENT: node_start_agente_4_adaptador
+{
+  "transcripcion_original": "La fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n",
+  "conceptos_clave": [
+    "energía",
+    "acción",
+    "agua",
+    "carbono",
+    "clorofila"
+  ],
+  "preguntas_generadas": [
+    "¿Qué explica el documento sobre energía?",
+    "¿Qué explica el documento sobre acción?",
+    "¿Qué explica el documento sobre agua?",
+    "¿Qué explica el documento sobre carbono?",
+    "¿Qué explica el documento sobre clorofila?"
+  ],
+  "respuestas_crudas": [
+    {
+      "pregunta": "¿Qué explica el documento sobre energía?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    },
+    {
+      "pregunta": "¿Qué explica el documento sobre acción?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    },
+    {
+      "pregunta": "¿Qué explica el documento sobre agua?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    },
+    {
+      "pregunta": "¿Qué explica el documento sobre carbono?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    },
+    {
+      "pregunta": "¿Qué explica el documento sobre clorofila?",
+      "respuesta": "Fuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1",
+      "fuente": "--- INICIO CHUNK 1 ---\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n--- FIN CHUNK 1 ---"
+    }
+  ],
+  "perfil_objetivo": "estudiante universitario",
+  "intentos_auditoria": 1,
+  "aprobado_por_auditor": true
+}
+--------------------------------------------------
+[2026-09-10T15:32:34.249979+00:00] EVENT: node_end_agente_4_adaptador
+{
+  "cuestionario_final": "# Cuestionario para estudiante universitario\n\n## 1. ¿Qué explica el documento sobre energía?\n\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1\n\n## 2. ¿Qué explica el documento sobre acción?\n\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1\n\n## 3. ¿Qué explica el documento sobre agua?\n\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1\n\n## 4. ¿Qué explica el documento sobre carbono?\n\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1\n\n## 5. ¿Qué explica el documento sobre clorofila?\n\nFuente: CHUNK 1\nLa fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.\n\nFuente: CHUNK 1\n"
+}
+--------------------------------------------------

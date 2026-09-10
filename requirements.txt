@@ -14,3 +14,6 @@ sentence-transformers==6.0.1
 # Requisito externo, no se instala con pip:
 # Ollama: https://ollama.com/download
 # Modelo recomendado: ollama pull gemma4:e2b
+
+arize-phoenix
+openinference-instrumentation-langchain

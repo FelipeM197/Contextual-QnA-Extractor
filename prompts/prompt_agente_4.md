@@ -20,4 +20,5 @@ Reescribe el cuestionario recopilado ajustando el registro, el tono y la clarida
 {contenido}
 </cuestionario_crudo>
 
-Genera a continuación el cuestionario en Markdown respetando todas las etiquetas de fuente:
+Genera a continuación el cuestionario en Markdown respetando todas las etiquetas de fuente.
+IMPORTANTE: Tu respuesta final DEBE contener ÚNICAMENTE el texto en formato Markdown de las preguntas y respuestas. NO incluyas ninguna introducción, conclusión, comentarios adicionales, ni etiquetas o bloques de proceso de pensamiento (como <think>). Devuelve SOLO el Markdown final.

@@ -1,4 +1,5 @@
 import sys
+import re
 from typing import TypedDict, Any
 from pathlib import Path
 from pydantic import BaseModel, Field, create_model
@@ -171,6 +172,8 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
                 prompt = prompt_base.replace("{perfil}", perfil).replace("{contenido}", contenido)
                 print(f"[Agente 4] Invocando Ollama para formatear cuestionario al perfil '{perfil}'...", flush=True)
                 final = llm.invoke(prompt).content
+                # Eliminar etiquetas <think>...</think> que algunos modelos añaden
+                final = re.sub(r'<think>.*?</think>\s*', '', final, flags=re.DOTALL).strip()
                 logger.log_llm_interaction(prompt, final)
                 metodo = "adaptación del LLM con etiquetas preservadas"
                 certeza = 0.85
