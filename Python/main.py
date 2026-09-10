@@ -7,6 +7,7 @@ from pathlib import Path
 from langchain_ollama import ChatOllama
 import utils
 import RAG
+from logger import init_logger
 
 # Asegura que los prints se muestren en tiempo real sin bloqueo de buffer en pipes/consola
 sys.stdout.reconfigure(line_buffering=True)
@@ -61,6 +62,9 @@ def main():
     processed_dir.mkdir(parents=True, exist_ok=True)
     logs_dir.mkdir(parents=True, exist_ok=True)
     prompts_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Inicializar el logger global
+    init_logger(outputs_dir)
     
     input_file_path = inputs_dir / args.input
     if not input_file_path.exists():

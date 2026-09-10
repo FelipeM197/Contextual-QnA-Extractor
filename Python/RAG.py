@@ -4,6 +4,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field, create_model
 from langgraph.graph import END, START, StateGraph
 import utils
+from logger import get_logger
 
 # total=False permite mutar e incorporar claves incrementalmente según avanza el grafo
 class QAState(TypedDict, total=False):
@@ -53,14 +54,22 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
     a_len = params.get("a_len", "detalladas y analiticas")
 
     def agente_1_analista(state: QAState) -> dict:
+        logger = get_logger()
+        logger.log_node_start("agente_1_analista", dict(state))
+        
         print("[Agente 1] Evidencia: transcripción recibida", flush=True)
         conceptos = utils.extraer_conceptos_tfidf(state["transcripcion_original"], top_n=top_n)
         print("[Agente 1] Decisión: conceptos extraídos con TF-IDF", flush=True)
         print("[Agente 1] Conceptos:", ", ".join(conceptos), flush=True)
         print("[Agente 1] Certeza del método: 1.00 (cálculo determinístico)", flush=True)
-        return {"conceptos_clave": conceptos}
+        
+        update = {"conceptos_clave": conceptos}
+        logger.log_node_end("agente_1_analista", update)
+        return update
 
     def agente_2_preguntas(state: QAState) -> dict:
+        logger = get_logger()
+        logger.log_node_start("agente_2_preguntas", dict(state))
         print("[Agente 2] Generando preguntas a partir de los conceptos clave...", flush=True)
         prompt_base = cargar_prompt(prompts_dir, "prompt_agente_2")
         conceptos_str = ", ".join(state["conceptos_clave"])
@@ -74,6 +83,7 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
                 print(f"[Agente 2] Invocando Ollama ({params.get('modelo', 'LLM')}) para generar preguntas...", flush=True)
                 # Invocación directa a ChatOllama rápida sin bloqueos de tool_calling
                 resp_text = llm.invoke(prompt).content
+                logger.log_llm_interaction(prompt, resp_text)
                 lines = [line.strip() for line in resp_text.splitlines() if line.strip() and ("?" in line or line[0].isdigit() or "." in line[:3])]
                 if len(lines) >= top_n:
                     preguntas = lines[:top_n]
@@ -83,6 +93,7 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
                 certeza = 0.85
                 metodo = "respuesta de texto del LLM"
             except Exception as e:
+                logger.log_event("llm_error", {"agent": "agente_2", "error": str(e)})
                 terms = state["conceptos_clave"] or ["el documento"]
                 preguntas = [f"¿Qué explica el documento sobre {term}?" for term in terms[:top_n]]
                 certeza = 0.70
@@ -97,9 +108,14 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
         print(f"[Agente 2] Decisión: {metodo}", flush=True)
         print(f"[Agente 2] Preguntas generadas: {len(preguntas)}", flush=True)
         print(f"[Agente 2] Certeza estimada: {certeza:.2f}", flush=True)
-        return {"preguntas_generadas": preguntas}
+        
+        update = {"preguntas_generadas": preguntas}
+        logger.log_node_end("agente_2_preguntas", update)
+        return update
 
     def agente_3_resolutor(state: QAState) -> dict:
+        logger = get_logger()
+        logger.log_node_start("agente_3_resolutor", dict(state))
         print("[Agente 3] Iniciando resolución de preguntas y búsqueda de evidencia...", flush=True)
         prompt_base = cargar_prompt(prompts_dir, "prompt_agente_3")
         respuestas = []
@@ -117,8 +133,10 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
                                         .replace("{a_len}", a_len)
                     print(f"[Agente 3] ({idx}/{total_q}) Invocando Ollama para responder con evidencia...", flush=True)
                     respuesta = llm.invoke(prompt).content
+                    logger.log_llm_interaction(prompt, respuesta)
                     metodo = "respuesta del LLM limitada al contexto"
-                except Exception:
+                except Exception as e:
+                    logger.log_event("llm_error", {"agent": "agente_3", "error": str(e)})
                     first_chunk = contexto.split("--- FIN CHUNK 1 ---")[0]
                     respuesta = first_chunk.replace("--- INICIO CHUNK 1 ---", "").strip() + "\n\nFuente: CHUNK 1"
                     metodo = "primer chunk recuperado como fallback"
@@ -132,9 +150,13 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
             print(f"[Agente 3] ({idx}/{total_q}) Certeza por evidencia recuperada: {certeza:.2f}", flush=True)
             respuestas.append({"pregunta": pregunta, "respuesta": respuesta, "fuente": contexto})
             
-        return {"respuestas_crudas": respuestas}
+        update = {"respuestas_crudas": respuestas}
+        logger.log_node_end("agente_3_resolutor", update)
+        return update
 
     def agente_4_adaptador(state: QAState) -> dict:
+        logger = get_logger()
+        logger.log_node_start("agente_4_adaptador", dict(state))
         print("[Agente 4] Adaptando respuestas al perfil y generando Markdown final...", flush=True)
         perfil = state.get("perfil_objetivo", "estudiante universitario")
         
@@ -147,9 +169,11 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
                 prompt = prompt_base.replace("{perfil}", perfil).replace("{contenido}", contenido)
                 print(f"[Agente 4] Invocando Ollama para formatear cuestionario al perfil '{perfil}'...", flush=True)
                 final = llm.invoke(prompt).content
+                logger.log_llm_interaction(prompt, final)
                 metodo = "adaptación del LLM con etiquetas preservadas"
                 certeza = 0.85
-            except Exception:
+            except Exception as e:
+                logger.log_event("llm_error", {"agent": "agente_4", "error": str(e)})
                 lines = [f"# Cuestionario para {perfil}", ""]
                 for index, item in enumerate(state["respuestas_crudas"], start=1):
                     lines.extend([f"## {index}. {item['pregunta']}", "", item["respuesta"], ""])
@@ -167,7 +191,10 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
         print("[Agente 4] Evidencia: respuestas y fuentes del Agente 3", flush=True)
         print(f"[Agente 4] Decisión: {metodo}", flush=True)
         print(f"[Agente 4] Certeza de formato: {certeza:.2f}", flush=True)
-        return {"cuestionario_final": final}
+        
+        update = {"cuestionario_final": final}
+        logger.log_node_end("agente_4_adaptador", update)
+        return update
 
     # Topología strictly secuencial: Analista -> Formulador -> Resolutor -> Adaptador
     graph_builder = StateGraph(QAState)

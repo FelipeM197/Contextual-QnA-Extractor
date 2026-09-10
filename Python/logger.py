@@ -14,11 +14,12 @@ class RAGLogger:
         self.logs_dir.mkdir(parents=True, exist_ok=True)
         
         timestamp = datetime.now(datetime.UTC).strftime("%Y%m%d_%H%M%S")
-        self.log_file = self.logs_dir / f"run_{timestamp}.log"
+        self.log_file_jsonl = self.logs_dir / "dataset_training.jsonl"
+        self.log_file_txt = self.logs_dir / "dataset_training.log"
         
         # Escribimos un evento de inicio
         self.log_event("system_start", {"timestamp": timestamp})
-        print(f"[Logger] Inicializado: {self.log_file}")
+        print(f"[Logger] Inicializado: {self.log_file_txt} y .jsonl")
 
     def log_event(self, event_type: str, data: Dict[str, Any]):
         """Escribe un evento en formato JSONL."""
@@ -28,9 +29,17 @@ class RAGLogger:
             "data": data
         }
         
-        with open(self.log_file, "a", encoding="utf-8") as f:
-            # json.dumps asegura que se escriba en una sola línea (JSONL)
-            f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
+        json_line = json.dumps(log_entry, ensure_ascii=False) + "\n"
+        
+        # Guardar como JSONL estricto
+        with open(self.log_file_jsonl, "a", encoding="utf-8") as f:
+            f.write(json_line)
+            
+        # Guardar como LOG legible
+        with open(self.log_file_txt, "a", encoding="utf-8") as f:
+            f.write(f"[{log_entry['timestamp']}] EVENT: {event_type}\n")
+            f.write(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
+            f.write("-" * 50 + "\n")
 
     def log_node_start(self, node_name: str, state: Dict[str, Any]):
         self.log_event(f"node_start_{node_name}", state)

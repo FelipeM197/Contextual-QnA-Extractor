@@ -60,6 +60,14 @@ flowchart TD
 - `sh/`: Scripts de inicialización por consola (`bash` y `powershell`).
 - `docs/`: Documentación del proyecto (planes y guías).
 
+## 📊 Registro de Ejecución (Logs para Entrenamiento)
+
+Con el fin de auditar el sistema y recopilar datos masivos para el futuro entrenamiento (Fine-Tuning) de modelos propios, el sistema captura el "pensamiento" completo de la IA en cada ejecución (prompts exactos, respuestas crudas, contextos y errores). 
+
+Estos datos se guardan centralizados en dos mega-archivos dentro de `outputs/logs/`:
+- **`dataset_training.log`**: Un archivo de texto estructurado y legible por humanos. Muestra cada evento separado de forma visual y clara, ideal para revisar manualmente el razonamiento de los Agentes paso a paso.
+- **`dataset_training.jsonl`**: Contiene exactamente la misma información pero en formato *JSON Lines*. Este formato es el estándar de la industria para ingestar y entrenar modelos directamente mediante librerías como HuggingFace o la API de OpenAI.
+
 ## 🚀 Requisitos Previos
 
 1. **Entorno Python**: Asegúrate de usar el entorno con las dependencias instaladas (ej. `conda activate QAG_System`).
