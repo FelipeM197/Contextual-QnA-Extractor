@@ -7,8 +7,8 @@ from pathlib import Path
 from langchain_ollama import ChatOllama
 import utils
 import RAG
-from logger import init_logger
-
+import phoenix as px
+from openinference.instrumentation.langchain import LangChainInstrumentor
 # Asegura que los prints se muestren en tiempo real sin bloqueo de buffer en pipes/consola
 sys.stdout.reconfigure(line_buffering=True)
 
@@ -63,7 +63,13 @@ def main():
     logs_dir.mkdir(parents=True, exist_ok=True)
     prompts_dir.mkdir(parents=True, exist_ok=True)
     
-    init_logger(outputs_dir)
+    # Iniciar Arize Phoenix y el auto-tracing de LangChain/LangGraph
+    print("\n[Main] Iniciando servidor de observabilidad Arize Phoenix...")
+    try:
+        px.launch_app()
+    except Exception as e:
+        print(f"[Main] Advertencia: Arize Phoenix ya está corriendo o no pudo iniciar ({e})")
+    LangChainInstrumentor().instrument()
     
     input_file_path = inputs_dir / args.input
     if not input_file_path.exists():
