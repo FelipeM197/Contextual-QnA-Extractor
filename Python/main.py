@@ -67,14 +67,18 @@ def main():
     
     # Configurar el envío de trazas al servidor independiente de Phoenix
     print("\n[Main] Conectando Instrumentador a Phoenix local (http://127.0.0.1:6006)...")
-    os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "http://127.0.0.1:6006"
+    # --- Integración con Arize Phoenix para observabilidad ---
     try:
         from phoenix.otel import register
-        tracer_provider = register()
+        tracer_provider = register(
+            project_name="Contextual-QnA-Extractor",
+            endpoint="http://localhost:6006/v1/traces"
+        )
         LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
-    except ImportError:
-        print("[WARNING] No se encontró arize-phoenix-otel. Asegúrate de instalarlo para ver trazas en Phoenix.")
-        LangChainInstrumentor().instrument()
+        print("[Init] Instrumentación de Phoenix iniciada exitosamente.")
+    except Exception as e:
+        print(f"[Init] Advertencia: No se pudo iniciar Phoenix ({e}). Continuando sin tracing.")
+    # ---------------------------------------------------------
     
     input_file_path = inputs_dir / args.input
     if not input_file_path.exists():
