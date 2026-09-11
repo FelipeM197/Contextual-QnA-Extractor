@@ -63,12 +63,18 @@ def main():
     logs_dir.mkdir(parents=True, exist_ok=True)
     prompts_dir.mkdir(parents=True, exist_ok=True)
     
-    init_logger(outputs_dir)
+    init_logger(logs_dir)
     
     # Configurar el envío de trazas al servidor independiente de Phoenix
     print("\n[Main] Conectando Instrumentador a Phoenix local (http://127.0.0.1:6006)...")
-    os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "http://127.0.0.1:6006/v1/traces"
-    LangChainInstrumentor().instrument()
+    os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "http://127.0.0.1:6006"
+    try:
+        from phoenix.otel import register
+        tracer_provider = register()
+        LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
+    except ImportError:
+        print("[WARNING] No se encontró arize-phoenix-otel. Asegúrate de instalarlo para ver trazas en Phoenix.")
+        LangChainInstrumentor().instrument()
     
     input_file_path = inputs_dir / args.input
     if not input_file_path.exists():

@@ -18,6 +18,7 @@ class QAState(TypedDict, total=False):
     intentos_auditoria: int
     aprobado_por_auditor: bool
     notas_auditoria: str
+    indice_rechazo: int
 
 def certeza_contexto(contexto: str) -> float:
     """Heurística de certeza ligada a la densidad de fragmentos recuperados (tope 0.95)."""
@@ -75,44 +76,68 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
         return update
 
     def agente_2_preguntas(state: QAState) -> dict:
+        import rag_tools
         print("[Agente 2] Generando preguntas a partir de los conceptos clave...", flush=True)
-        prompt_base = cargar_prompt(prompts_dir, "prompt_agente_2")
-        conceptos_str = ", ".join(state["conceptos_clave"])
-        
-        prompt = prompt_base.replace("{conceptos}", conceptos_str)\
-                            .replace("{texto}", state["transcripcion_original"])\
-                            .replace("{q_len}", q_len)
         
         notas = state.get("notas_auditoria")
-        if notas:
-            print(f"[Agente 2] ♻️ Iteración {state.get('intentos_auditoria', 0)}. Aplicando correcciones del auditor...", flush=True)
-            prompt += f"\n\n<correcciones_auditor>\nIMPORTANTE: Tu intento anterior falló por el siguiente motivo:\n{notas}\n\nPor favor, genera preguntas DISTINTAS o más fáciles de responder basándose ESTRICTAMENTE en el texto.\n</correcciones_auditor>"
+        indice_rechazo = state.get("indice_rechazo")
+        preguntas_anteriores = state.get("preguntas_generadas", [])
         
-        if llm is not None:
-            try:
-                print(f"[Agente 2] Invocando Ollama ({params.get('modelo', 'LLM')}) para generar preguntas...", flush=True)
-                # Invocación directa a ChatOllama rápida sin bloqueos de tool_calling
-                resp_text = llm.invoke(prompt).content
-                lines = [line.strip() for line in resp_text.splitlines() if line.strip() and ("?" in line or line[0].isdigit() or "." in line[:3])]
-                if len(lines) >= top_n:
-                    preguntas = lines[:top_n]
-                else:
+        # Tool: Resumen extractivo para ahorrar VRAM en equipos modestos
+        resumen = rag_tools.extract_extractive_summary(state["transcripcion_original"])
+        
+        if notas and preguntas_anteriores and indice_rechazo is not None:
+            print(f"[Agente 2] ♻️ Iteración {state.get('intentos_auditoria', 0)}. Corrigiendo la pregunta {indice_rechazo + 1}...", flush=True)
+            prompt_retry = f"Contexto del documento (resumen):\n{resumen}\n\nEl auditor rechazó tu pregunta anterior por este motivo:\n{notas}\n\nBasándote estrictamente en el texto, genera UNA (1) sola pregunta nueva que reemplace a la problemática y sea más fácil de responder con la evidencia. Responde ÚNICAMENTE con la pregunta, sin enumeraciones ni preámbulos."
+            if llm is not None:
+                try:
+                    nueva_pregunta = llm.invoke(prompt_retry).content.strip()
+                    nueva_pregunta = re.sub(r'^\d+[\.\)]\s*', '', nueva_pregunta).strip()
+                    if nueva_pregunta.startswith('"') and nueva_pregunta.endswith('"'):
+                        nueva_pregunta = nueva_pregunta[1:-1]
+                    preguntas = preguntas_anteriores.copy()
+                    preguntas[indice_rechazo] = nueva_pregunta
+                    certeza = 0.85
+                    metodo = "corrección puntual de pregunta rechazada"
+                except Exception as e:
+                    preguntas = preguntas_anteriores
+                    certeza = 0.70
+                    metodo = f"fallback por excepción LLM ({str(e)})"
+            else:
+                preguntas = preguntas_anteriores
+                certeza = 0.70
+                metodo = "fallback determinístico"
+        else:
+            prompt_base = cargar_prompt(prompts_dir, "prompt_agente_2")
+            conceptos_str = ", ".join(state["conceptos_clave"])
+            prompt = prompt_base.replace("{conceptos}", conceptos_str)\
+                                .replace("{texto}", resumen)\
+                                .replace("{q_len}", q_len)
+            
+            if llm is not None:
+                try:
+                    print(f"[Agente 2] Invocando Ollama ({params.get('modelo', 'LLM')}) para generar preguntas...", flush=True)
+                    resp_text = llm.invoke(prompt).content
+                    lines = [line.strip() for line in resp_text.splitlines() if line.strip() and ("?" in line or line[0].isdigit() or "." in line[:3])]
+                    if len(lines) >= top_n:
+                        preguntas = lines[:top_n]
+                    else:
+                        terms = state["conceptos_clave"] or ["el documento"]
+                        preguntas = [f"¿Qué explica el documento sobre {term}?" for term in terms[:top_n]]
+                    certeza = 0.85
+                    metodo = "respuesta de texto del LLM"
+                except Exception as e:
                     terms = state["conceptos_clave"] or ["el documento"]
                     preguntas = [f"¿Qué explica el documento sobre {term}?" for term in terms[:top_n]]
-                certeza = 0.85
-                metodo = "respuesta de texto del LLM"
-            except Exception as e:
+                    certeza = 0.70
+                    metodo = f"fallback determinístico por excepción LLM ({str(e)})"
+            else:
                 terms = state["conceptos_clave"] or ["el documento"]
                 preguntas = [f"¿Qué explica el documento sobre {term}?" for term in terms[:top_n]]
                 certeza = 0.70
-                metodo = f"fallback determinístico por excepción LLM ({str(e)})"
-        else:
-            terms = state["conceptos_clave"] or ["el documento"]
-            preguntas = [f"¿Qué explica el documento sobre {term}?" for term in terms[:top_n]]
-            certeza = 0.70
-            metodo = "fallback determinístico basado en conceptos"
+                metodo = "fallback determinístico basado en conceptos"
             
-        print("[Agente 2] Evidencia: conceptos del Agente 1", flush=True)
+        print("[Agente 2] Evidencia: conceptos del Agente 1" if not notas else "[Agente 2] Evidencia: retroalimentación del auditor", flush=True)
         print(f"[Agente 2] Decisión: {metodo}", flush=True)
         print(f"[Agente 2] Preguntas generadas: {len(preguntas)}", flush=True)
         print(f"[Agente 2] Certeza estimada: {certeza:.2f}", flush=True)
@@ -139,14 +164,13 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
             
             # Loop de Self-Correction (Re-recuperación de Contexto)
             intentos_busqueda = 1
-            while certeza < 0.5 and intentos_busqueda < 2 and llm is not None:
-                print(f"[Agente 3] ⚠️ Certeza muy baja ({certeza:.2f}). Reformulando pregunta para re-buscar...", flush=True)
-                prompt_rewrite = f"Reescribe esta pregunta enfocándote en sus sustantivos y conceptos clave para mejorar una búsqueda en base de datos vectorial.\nPregunta original: {pregunta}\nResponde SOLO con la nueva consulta de búsqueda, sin preámbulos."
+            while certeza < 0.5 and intentos_busqueda <= 3:
+                import rag_tools
+                print(f"[Agente 3] ⚠️ Certeza muy baja ({certeza:.2f}). Extrayendo palabras clave sin LLM...", flush=True)
+                pregunta_reformulada = rag_tools.extract_query_keywords(pregunta)
+                print(f"[Agente 3] Nueva query de búsqueda: '{pregunta_reformulada}'", flush=True)
+                
                 try:
-                    pregunta_reformulada = llm.invoke(prompt_rewrite).content.strip()
-                    if pregunta_reformulada.startswith('"') and pregunta_reformulada.endswith('"'):
-                        pregunta_reformulada = pregunta_reformulada[1:-1]
-                    print(f"[Agente 3] Nueva query de búsqueda: '{pregunta_reformulada}'", flush=True)
                     contexto_nuevo = recuperar_contexto_local(store, pregunta_reformulada, top_k)
                     certeza_nueva = certeza_contexto(contexto_nuevo)
                     if certeza_nueva > certeza:
@@ -240,6 +264,7 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
         respuestas = state.get("respuestas_crudas", [])
         aprobado = True
         notas = ""
+        indice_rechazo = None
         
         # Hard limit to prevent infinite RAG hallucination loops.
         if intentos >= 3:
@@ -252,18 +277,26 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
                 prompt_base = "Evalúa si las respuestas se basan estrictamente en la evidencia. Responde APROBADO o RECHAZADO."
                 
             for idx, item in enumerate(respuestas, start=1):
+                import rag_tools
+                lexical_score = rag_tools.calculate_lexical_grounding(item["respuesta"], item["fuente"])
+                print(f"[Agente 5] Solapamiento léxico para pregunta {idx}: {lexical_score*100:.0f}%", flush=True)
+                
                 prompt = prompt_base.replace("{candidate_question}", item["pregunta"])\
                                     .replace("{candidate_answer}", item["respuesta"])\
                                     .replace("{context_chunks}", item["fuente"])
+                
+                prompt += f"\n\n[DATO DE HERRAMIENTA]: El solapamiento léxico entre respuesta y contexto es del {lexical_score*100:.0f}%. Si es menor al 20%, es altamente probable que sea una alucinación."
+                
                 try:
                     evaluacion = llm.invoke(prompt).content
                     
                     # Detect JSON field "is_grounded": false
                     # We accept both literal false or FALSE since LLMs can be unpredictable.
-                    if '"is_grounded": false' in evaluacion.lower():
-                        print(f"[Agente 5] ⚠️ Alucinación detectada en la pregunta {idx}. Rechazando el lote.", flush=True)
+                    if re.search(r'"is_grounded"\s*:\s*false', evaluacion.lower()):
+                        print(f"[Agente 5] ⚠️ Alucinación detectada en la pregunta {idx}. Rechazando.", flush=True)
                         aprobado = False
                         notas += f"\n- Pregunta problemática: '{item['pregunta']}'\n  Motivo de rechazo según auditor: {evaluacion}\n"
+                        indice_rechazo = idx - 1
                         break
                 except Exception as e:
                     # Fallback in case of failure is to allow it to pass.
@@ -281,6 +314,8 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
         update = {"aprobado_por_auditor": aprobado, "intentos_auditoria": intentos}
         if not aprobado:
             update["notas_auditoria"] = notas
+            if indice_rechazo is not None:
+                update["indice_rechazo"] = indice_rechazo
             
         return update
 

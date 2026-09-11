@@ -104,12 +104,12 @@ class QnAGuiApp(ctk.CTk):
 
         # Perfil de usuario
         ctk.CTkLabel(left_col, text="Perfil del Evaluado:", font=ctk.CTkFont(size=12), text_color="#CBD5E1").pack(anchor="w", padx=15, pady=(5, 2))
-        self.profile_combo = ctk.CTkComboBox(
+        self.profile_entry = ctk.CTkEntry(
             left_col, 
-            values=["estudiante universitario", "técnico avanzado", "principiante", "estudiante secundario"]
+            placeholder_text="Ej: estudiante universitario"
         )
-        self.profile_combo.set("estudiante universitario")
-        self.profile_combo.pack(fill="x", padx=15, pady=(0, 8))
+        self.profile_entry.insert(0, "estudiante universitario")
+        self.profile_entry.pack(fill="x", padx=15, pady=(0, 8))
 
         # Modelo LLM
         ctk.CTkLabel(left_col, text="Modelo Ollama LLM:", font=ctk.CTkFont(size=12), text_color="#CBD5E1").pack(anchor="w", padx=15, pady=(5, 2))
@@ -122,12 +122,12 @@ class QnAGuiApp(ctk.CTk):
 
         # Número de preguntas
         ctk.CTkLabel(left_col, text="Número de Preguntas:", font=ctk.CTkFont(size=12), text_color="#CBD5E1").pack(anchor="w", padx=15, pady=(5, 2))
-        self.questions_combo = ctk.CTkComboBox(
+        self.questions_entry = ctk.CTkEntry(
             left_col, 
-            values=["5", "3", "8", "10"]
+            placeholder_text="Ej: 5"
         )
-        self.questions_combo.set("5")
-        self.questions_combo.pack(fill="x", padx=15, pady=(0, 15))
+        self.questions_entry.insert(0, "5")
+        self.questions_entry.pack(fill="x", padx=15, pady=(0, 15))
 
         # Action Button
         self.run_btn = ctk.CTkButton(
@@ -258,10 +258,39 @@ class QnAGuiApp(ctk.CTk):
                 pass
         self._log("[WARNING] No se pudo confirmar que Phoenix inició a tiempo. Las trazas iniciales podrían perderse.")
 
+    def _check_model_available(self, model_name: str) -> bool:
+        ollama = shutil.which("ollama")
+        if not ollama:
+            return False
+            
+        env = os.environ.copy()
+        if sys.platform == "win32" and Path("D:/").exists():
+            env["OLLAMA_MODELS"] = r"d:\Ollama_Modelos"
+            
+        try:
+            flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+            resultado = subprocess.run(
+                [ollama, "list"], capture_output=True, text=True, check=False, env=env, creationflags=flags
+            )
+            return any(line.startswith(model_name) for line in resultado.stdout.splitlines())
+        except Exception:
+            return False
+
     def _start_generation_thread(self):
         if not self.selected_file_path:
             messagebox.showwarning("Atención", "Por favor selecciona un archivo primero.")
             return
+
+        model = self.model_combo.get()
+        if not self._check_model_available(model):
+            proceed = messagebox.askyesno(
+                "Modelo no encontrado",
+                f"El modelo '{model}' no está disponible localmente.\n\n"
+                "El sistema entrará en MODO FALLBACK (búsqueda básica y extracción de texto crudo sin generación de IA).\n\n"
+                "¿Deseas continuar de todas formas?"
+            )
+            if not proceed:
+                return
 
         self.run_btn.configure(state="disabled", text="⏳ Procesando...")
         self.status_label.configure(text="Estado: Ejecutando RAG...", text_color="#F59E0B")
@@ -278,9 +307,9 @@ class QnAGuiApp(ctk.CTk):
                 self._log(f"[INFO] Copiado archivo a inputs/{self.selected_file_path.name}")
 
             input_filename = self.selected_file_path.name
-            profile = self.profile_combo.get()
+            profile = self.profile_entry.get()
             model = self.model_combo.get()
-            top_n = self.questions_combo.get()
+            top_n = self.questions_entry.get()
 
             self._log(f"\n=============================================")
             self._log(f" Ejecutando Sistema QnA RAG Multi-Agente")
