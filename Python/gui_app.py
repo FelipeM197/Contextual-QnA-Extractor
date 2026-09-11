@@ -14,6 +14,7 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import customtkinter as ctk
+from config import load_settings
 
 # Configuración del tema CustomTkinter
 ctk.set_appearance_mode("Dark")
@@ -27,12 +28,10 @@ class QnAGuiApp(ctk.CTk):
         self.geometry("900 x 720")
         self.minsize(800, 600)
 
-        self.project_dir = Path(__file__).resolve().parents[1]
-        self.inputs_dir = self.project_dir / "inputs"
-        self.outputs_dir = self.project_dir / "outputs" / "cuestionarios-logs"
-        
-        self.inputs_dir.mkdir(parents=True, exist_ok=True)
-        self.outputs_dir.mkdir(parents=True, exist_ok=True)
+        self.settings = load_settings()
+        self.project_dir = self.settings.project_dir
+        self.inputs_dir = self.settings.inputs_dir
+        self.outputs_dir = self.settings.logs_dir
 
         self.selected_file_path = None
         
@@ -264,8 +263,7 @@ class QnAGuiApp(ctk.CTk):
             return False
             
         env = os.environ.copy()
-        if sys.platform == "win32" and Path("D:/").exists():
-            env["OLLAMA_MODELS"] = r"d:\Ollama_Modelos"
+        env["OLLAMA_MODELS"] = str(self.settings.ollama_models_dir)
             
         try:
             flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0

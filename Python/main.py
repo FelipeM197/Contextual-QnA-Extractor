@@ -7,6 +7,7 @@ from pathlib import Path
 from langchain_ollama import ChatOllama
 import utils
 import RAG
+from config import load_settings
 from logger import init_logger
 from openinference.instrumentation.langchain import LangChainInstrumentor
 # Asegura que los prints se muestren en tiempo real sin bloqueo de buffer en pipes/consola
@@ -45,23 +46,13 @@ def main():
     args = parser.parse_args()
     
     # 1. Configurar Entorno
-    utils.configurar_entorno()
-    
-    # Normalize base path to support arbitrary execution contexts (repo root, sh/, or Python/).
-    project_dir = Path.cwd().resolve()
-    if project_dir.name == "Python":
-        project_dir = project_dir.parent
-    
-    inputs_dir = project_dir / "inputs"
-    outputs_dir = project_dir / "outputs"
-    processed_dir = outputs_dir / "processed"
-    logs_dir = outputs_dir / "cuestionarios-logs"
-    prompts_dir = project_dir / "prompts"
-    
-    inputs_dir.mkdir(parents=True, exist_ok=True)
-    processed_dir.mkdir(parents=True, exist_ok=True)
-    logs_dir.mkdir(parents=True, exist_ok=True)
-    prompts_dir.mkdir(parents=True, exist_ok=True)
+    settings = load_settings()
+    utils.configurar_entorno(settings)
+
+    inputs_dir = settings.inputs_dir
+    processed_dir = settings.processed_dir
+    logs_dir = settings.logs_dir
+    prompts_dir = settings.prompts_dir
     
     init_logger(logs_dir)
     
@@ -80,14 +71,15 @@ def main():
         print(f"[Init] Advertencia: No se pudo iniciar Phoenix ({e}). Continuando sin tracing.")
     # ---------------------------------------------------------
     
-    input_file_path = inputs_dir / args.input
+    input_file_path = settings.resolve_input_path(args.input)
     if not input_file_path.exists():
         print(f"Error: No se encontró el archivo de entrada en {input_file_path}")
         
         # Transparent backwards compatibility for legacy data/input structure.
-        old_input = project_dir / "data" / "input" / args.input
-        if old_input.exists():
+        old_input = settings.project_dir / "data" / "input" / args.input
+        if old_input.exists() and old_input != input_file_path:
             print(f"Moviendo {args.input} desde data/input hacia inputs/...")
+            input_file_path = inputs_dir / Path(args.input).name
             shutil.copy2(old_input, input_file_path)
         else:
             return

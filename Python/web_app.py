@@ -4,6 +4,7 @@ import sys
 import shutil
 import subprocess
 from pathlib import Path
+from config import load_settings
 
 st.set_page_config(
     page_title="Contextual QnA Extractor",
@@ -40,12 +41,10 @@ st.markdown("""
 st.markdown('<div class="main-title">⚡ Contextual QnA Extractor</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-title">Interfaz Web Interactiva RAG Multi-Agente con Ollama & LangGraph</div>', unsafe_allow_html=True)
 
-BASE_DIR = Path(__file__).resolve().parents[1]
-INPUTS_DIR = BASE_DIR / "inputs"
-OUTPUTS_DIR = BASE_DIR / "outputs" / "cuestionarios-logs"
-
-INPUTS_DIR.mkdir(parents=True, exist_ok=True)
-OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+SETTINGS = load_settings()
+BASE_DIR = SETTINGS.project_dir
+INPUTS_DIR = SETTINGS.inputs_dir
+OUTPUTS_DIR = SETTINGS.logs_dir
 
 # Sidebar - Configuración
 st.sidebar.header("⚙️ Configuración del RAG")
@@ -99,7 +98,7 @@ if uploaded_file is not None:
                 
                 base_stem = Path(uploaded_file.name).stem
                 out_file = OUTPUTS_DIR / f"cuestionario_{base_stem}.md"
-                out_json = BASE_DIR / "outputs" / "cuestionario_gemma.json"
+                out_json = SETTINGS.outputs_dir / "cuestionario_gemma.json"
                 
                 if out_file.exists():
                     st.subheader("📄 Cuestionario Generado (Markdown)")

@@ -1,8 +1,10 @@
 import json
 import pandas as pd
 from pathlib import Path
+from config import load_settings
 
 def main():
+    settings = load_settings()
     print("Conectando al servidor local de Phoenix (http://127.0.0.1:6006)...")
     try:
         import os
@@ -13,9 +15,7 @@ def main():
         print(f"Error al conectar con Phoenix: {e}")
         return
 
-    squad_path = Path("../train-v2.0.json")
-    if not squad_path.exists():
-        squad_path = Path("train-v2.0.json")
+    squad_path = settings.squad_dataset_path
 
     print(f"Cargando dataset SQuAD desde: {squad_path.resolve()}")
     try:
@@ -26,8 +26,7 @@ def main():
         return
 
     # Preparar el directorio de salida para los contextos (los archivos .txt para tu GUI)
-    txt_output_dir = Path("inputs/squad_samples")
-    txt_output_dir.mkdir(parents=True, exist_ok=True)
+    txt_output_dir = settings.squad_samples_dir
 
     records = []
     posibles = 0
