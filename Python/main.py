@@ -7,7 +7,7 @@ from pathlib import Path
 from langchain_ollama import ChatOllama
 import utils
 import RAG
-import phoenix as px
+from logger import init_logger
 from openinference.instrumentation.langchain import LangChainInstrumentor
 # Asegura que los prints se muestren en tiempo real sin bloqueo de buffer en pipes/consola
 sys.stdout.reconfigure(line_buffering=True)
@@ -62,6 +62,8 @@ def main():
     processed_dir.mkdir(parents=True, exist_ok=True)
     logs_dir.mkdir(parents=True, exist_ok=True)
     prompts_dir.mkdir(parents=True, exist_ok=True)
+    
+    init_logger(outputs_dir)
     
     # Configurar el envío de trazas al servidor independiente de Phoenix
     print("\n[Main] Conectando Instrumentador a Phoenix local (http://127.0.0.1:6006)...")

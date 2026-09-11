@@ -220,6 +220,44 @@ class QnAGuiApp(ctk.CTk):
         else:
             subprocess.run(["xdg-open", folder])
 
+    def _ensure_phoenix_running(self):
+        import urllib.request
+        import time
+        try:
+            urllib.request.urlopen("http://127.0.0.1:6006/", timeout=1)
+            self._log("[INFO] Servidor Phoenix ya está corriendo en el puerto 6006.")
+            return
+        except Exception:
+            self._log("[INFO] Iniciando servidor Arize Phoenix automáticamente...")
+            
+        if sys.platform == "win32":
+            script_path = self.project_dir / "sh" / "iniciar_phoenix.ps1"
+            cmd = ["powershell", "-ExecutionPolicy", "Bypass", "-File", str(script_path)]
+            subprocess.Popen(
+                cmd,
+                cwd=str(self.project_dir),
+                creationflags=subprocess.CREATE_NEW_CONSOLE
+            )
+        else:
+            script_path = self.project_dir / "sh" / "iniciar_phoenix.sh"
+            cmd = ["bash", str(script_path)]
+            subprocess.Popen(
+                cmd,
+                cwd=str(self.project_dir),
+                start_new_session=True
+            )
+            
+        self._log("[INFO] Esperando a que el servidor Phoenix responda (puede tardar unos segundos)...")
+        for _ in range(15):
+            time.sleep(1)
+            try:
+                urllib.request.urlopen("http://127.0.0.1:6006/", timeout=1)
+                self._log("[INFO] ¡Servidor Phoenix iniciado exitosamente en una nueva ventana!")
+                return
+            except Exception:
+                pass
+        self._log("[WARNING] No se pudo confirmar que Phoenix inició a tiempo. Las trazas iniciales podrían perderse.")
+
     def _start_generation_thread(self):
         if not self.selected_file_path:
             messagebox.showwarning("Atención", "Por favor selecciona un archivo primero.")
@@ -251,6 +289,8 @@ class QnAGuiApp(ctk.CTk):
             self._log(f" Modelo  : {model}")
             self._log(f" Preguntas: {top_n}")
             self._log(f"=============================================\n")
+
+            self._ensure_phoenix_running()
 
             # 2. Ejecutar a través de los scripts sh/ (.sh o .ps1) según OS
             if sys.platform == "win32":

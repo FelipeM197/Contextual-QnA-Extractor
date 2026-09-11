@@ -5,6 +5,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field, create_model
 from langgraph.graph import END, START, StateGraph
 import utils
+from logger import get_logger
 
 # total=False permite mutar e incorporar claves incrementalmente según avanza el grafo
 class QAState(TypedDict, total=False):
@@ -16,6 +17,7 @@ class QAState(TypedDict, total=False):
     cuestionario_final: str
     intentos_auditoria: int
     aprobado_por_auditor: bool
+    notas_auditoria: str
 
 def certeza_contexto(contexto: str) -> float:
     """Heurística de certeza ligada a la densidad de fragmentos recuperados (tope 0.95)."""
@@ -56,12 +58,18 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
     a_len = params.get("a_len", "detalladas y analiticas")
 
     def agente_1_analista(state: QAState) -> dict:
-        
+        logger = get_logger()
         print("[Agente 1] Evidencia: transcripción recibida", flush=True)
         conceptos = utils.extraer_conceptos_tfidf(state["transcripcion_original"], top_n=top_n)
         print("[Agente 1] Decisión: conceptos extraídos con TF-IDF", flush=True)
         print("[Agente 1] Conceptos:", ", ".join(conceptos), flush=True)
         print("[Agente 1] Certeza del método: 1.00 (cálculo determinístico)", flush=True)
+        
+        logger.log_event("agente_1_analista", "extracción_conceptos", {
+            "metodo": "TF-IDF",
+            "conceptos_extraidos": conceptos,
+            "certeza": 1.00
+        })
         
         update = {"conceptos_clave": conceptos}
         return update
@@ -74,6 +82,11 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
         prompt = prompt_base.replace("{conceptos}", conceptos_str)\
                             .replace("{texto}", state["transcripcion_original"])\
                             .replace("{q_len}", q_len)
+        
+        notas = state.get("notas_auditoria")
+        if notas:
+            print(f"[Agente 2] ♻️ Iteración {state.get('intentos_auditoria', 0)}. Aplicando correcciones del auditor...", flush=True)
+            prompt += f"\n\n<correcciones_auditor>\nIMPORTANTE: Tu intento anterior falló por el siguiente motivo:\n{notas}\n\nPor favor, genera preguntas DISTINTAS o más fáciles de responder basándose ESTRICTAMENTE en el texto.\n</correcciones_auditor>"
         
         if llm is not None:
             try:
@@ -104,6 +117,12 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
         print(f"[Agente 2] Preguntas generadas: {len(preguntas)}", flush=True)
         print(f"[Agente 2] Certeza estimada: {certeza:.2f}", flush=True)
         
+        get_logger().log_event("agente_2_preguntas", "generación_preguntas", {
+            "metodo": metodo,
+            "preguntas": preguntas,
+            "certeza": certeza
+        })
+        
         update = {"preguntas_generadas": preguntas}
         return update
 
@@ -118,6 +137,25 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
             contexto = recuperar_contexto_local(store, pregunta, top_k)
             certeza = certeza_contexto(contexto)
             
+            # Loop de Self-Correction (Re-recuperación de Contexto)
+            intentos_busqueda = 1
+            while certeza < 0.5 and intentos_busqueda < 2 and llm is not None:
+                print(f"[Agente 3] ⚠️ Certeza muy baja ({certeza:.2f}). Reformulando pregunta para re-buscar...", flush=True)
+                prompt_rewrite = f"Reescribe esta pregunta enfocándote en sus sustantivos y conceptos clave para mejorar una búsqueda en base de datos vectorial.\nPregunta original: {pregunta}\nResponde SOLO con la nueva consulta de búsqueda, sin preámbulos."
+                try:
+                    pregunta_reformulada = llm.invoke(prompt_rewrite).content.strip()
+                    if pregunta_reformulada.startswith('"') and pregunta_reformulada.endswith('"'):
+                        pregunta_reformulada = pregunta_reformulada[1:-1]
+                    print(f"[Agente 3] Nueva query de búsqueda: '{pregunta_reformulada}'", flush=True)
+                    contexto_nuevo = recuperar_contexto_local(store, pregunta_reformulada, top_k)
+                    certeza_nueva = certeza_contexto(contexto_nuevo)
+                    if certeza_nueva > certeza:
+                        contexto = contexto_nuevo
+                        certeza = certeza_nueva
+                except Exception as e:
+                    pass
+                intentos_busqueda += 1
+
             if llm is not None:
                 try:
                     prompt = prompt_base.replace("{pregunta}", pregunta)\
@@ -139,6 +177,13 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
             print(f"[Agente 3] ({idx}/{total_q}) Decisión: {metodo}", flush=True)
             print(f"[Agente 3] ({idx}/{total_q}) Certeza por evidencia recuperada: {certeza:.2f}", flush=True)
             respuestas.append({"pregunta": pregunta, "respuesta": respuesta, "fuente": contexto})
+            
+            get_logger().log_event("agente_3_resolutor", "respuesta_generada", {
+                "pregunta": pregunta,
+                "respuesta": respuesta,
+                "certeza": certeza,
+                "metodo": metodo
+            })
             
         update = {"respuestas_crudas": respuestas}
         return update
@@ -179,6 +224,12 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
         print(f"[Agente 4] Decisión: {metodo}", flush=True)
         print(f"[Agente 4] Certeza de formato: {certeza:.2f}", flush=True)
         
+        get_logger().log_event("agente_4_adaptador", "generacion_markdown", {
+            "metodo": metodo,
+            "certeza": certeza,
+            "perfil_objetivo": perfil
+        })
+        
         update = {"cuestionario_final": final}
         return update
 
@@ -188,6 +239,7 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
         intentos = state.get("intentos_auditoria", 0) + 1
         respuestas = state.get("respuestas_crudas", [])
         aprobado = True
+        notas = ""
         
         # Hard limit to prevent infinite RAG hallucination loops.
         if intentos >= 3:
@@ -211,6 +263,7 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
                     if '"is_grounded": false' in evaluacion.lower():
                         print(f"[Agente 5] ⚠️ Alucinación detectada en la pregunta {idx}. Rechazando el lote.", flush=True)
                         aprobado = False
+                        notas += f"\n- Pregunta problemática: '{item['pregunta']}'\n  Motivo de rechazo según auditor: {evaluacion}\n"
                         break
                 except Exception as e:
                     # Fallback in case of failure is to allow it to pass.
@@ -220,7 +273,15 @@ def crear_grafo(llm, store, prompts_dir: Path, params: dict):
             
         print(f"[Agente 5] Veredicto del Auditor: {'APROBADO' if aprobado else 'RECHAZADO'}", flush=True)
         
+        get_logger().log_event("agente_5_auditor", "validacion_guardrail", {
+            "intentos": intentos,
+            "aprobado": aprobado
+        })
+        
         update = {"aprobado_por_auditor": aprobado, "intentos_auditoria": intentos}
+        if not aprobado:
+            update["notas_auditoria"] = notas
+            
         return update
 
     def auditor_router(state: QAState) -> str:
