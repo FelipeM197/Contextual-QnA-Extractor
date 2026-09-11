@@ -75,6 +75,8 @@ Los registros se centralizan en `outputs/logs/`:
 
 Las rutas se resuelven desde `Python/config.py`, por lo que el sistema funciona igual aunque se ejecute desde la raíz del proyecto, `Python/` o `sh/`. Por defecto usa las carpetas incluidas en el repositorio. Para cambiar su ubicación, define estas variables antes de iniciar la aplicación; las rutas relativas se interpretan respecto a `CONTEXTUAL_QNA_PROJECT_DIR`.
 
+Para ver el procedimiento completo de cambio temporal o permanente en cada sistema operativo, consulta la [guía de rutas para Windows y Linux](docs/GUIA_RUTAS_WINDOWS_LINUX.md).
+
 | Variable | Valor por defecto |
 |---|---|
 | `CONTEXTUAL_QNA_PROJECT_DIR` | raíz detectada automáticamente |
