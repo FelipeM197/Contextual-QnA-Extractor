@@ -37,6 +37,9 @@ class QnAGuiApp(ctk.CTk):
         self.selected_file_path = None
         
         self._build_ui()
+        
+        # Iniciar Phoenix y subir dataset en segundo plano
+        threading.Thread(target=self._startup_tasks, daemon=True).start()
 
     def _build_ui(self):
         # Header
@@ -181,6 +184,43 @@ class QnAGuiApp(ctk.CTk):
         )
         self.status_label.pack(side="right")
 
+    def _startup_tasks(self):
+        self._log("[INFO] Realizando tareas de inicio (Phoenix + SQuAD)...")
+        self._ensure_phoenix_running()
+        self._log("[INFO] Ejecutando script de subida SQuAD (esto tomará un momento)...")
+        
+        python_cmd = sys.executable
+        upload_script = self.project_dir / "Python" / "upload_squad.py"
+        
+        try:
+            flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+            
+            if sys.platform == "win32":
+                result = subprocess.run(
+                    [python_cmd, str(upload_script)],
+                    cwd=str(self.project_dir / "Python"),
+                    capture_output=True,
+                    text=True,
+                    creationflags=flags
+                )
+            else:
+                result = subprocess.run(
+                    [python_cmd, str(upload_script)],
+                    cwd=str(self.project_dir / "Python"),
+                    capture_output=True,
+                    text=True
+                )
+            
+            if result.returncode == 0:
+                self._log("[INFO] Dataset de entrenamiento (SQuAD) subido exitosamente a Phoenix.")
+                for line in result.stdout.splitlines():
+                    if "Muestra extraída:" in line or "Se crearon" in line:
+                        self._log(f"  > {line}")
+            else:
+                self._log(f"[WARNING] Error subiendo el dataset:\n{result.stderr}")
+        except Exception as e:
+            self._log(f"[WARNING] Excepción subiendo el dataset: {e}")
+
     def _select_file(self):
         filetypes = [
             ("Todos los archivos compatibles", "*.pdf *.docx *.doc *.txt *.md *.webp *.png *.jpg *.jpeg"),
@@ -268,10 +308,15 @@ class QnAGuiApp(ctk.CTk):
             env["OLLAMA_MODELS"] = r"d:\Ollama_Modelos"
             
         try:
-            flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
-            resultado = subprocess.run(
-                [ollama, "list"], capture_output=True, text=True, check=False, env=env, creationflags=flags
-            )
+            if sys.platform == "win32":
+                flags = subprocess.CREATE_NO_WINDOW
+                resultado = subprocess.run(
+                    [ollama, "list"], capture_output=True, text=True, check=False, env=env, creationflags=flags
+                )
+            else:
+                resultado = subprocess.run(
+                    [ollama, "list"], capture_output=True, text=True, check=False, env=env
+                )
             return any(line.startswith(model_name) for line in resultado.stdout.splitlines())
         except Exception:
             return False
