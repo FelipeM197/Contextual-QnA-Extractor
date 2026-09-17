@@ -34,3 +34,7 @@ Python/d:*
 # Archivos de sistema
 .DS_Store
 Thumbs.db
+
+# Datasets y CSV grandes
+*.csv
+inputs/train-v2.0.json
