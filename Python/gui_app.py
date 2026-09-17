@@ -117,7 +117,7 @@ class QnAGuiApp(ctk.CTk):
         ctk.CTkLabel(left_col, text="Modelo Ollama LLM:", font=ctk.CTkFont(size=12), text_color="#CBD5E1").pack(anchor="w", padx=15, pady=(5, 2))
         self.model_combo = ctk.CTkComboBox(
             left_col, 
-            values=["gemma4:e2b", "llama3.1", "gemma2", "mistral", "gemma4:e4b"]
+            values=["gemma4:e2b", "llama3.1", "gemma2", "mistral", "gemma4:e4b", "gemma2:9b", "llama3:8b"]
         )
         self.model_combo.set("gemma4:e2b")
         self.model_combo.pack(fill="x", padx=15, pady=(0, 8))
