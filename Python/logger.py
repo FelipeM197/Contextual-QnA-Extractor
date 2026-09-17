@@ -1,60 +1,51 @@
+import logging
 import json
-import os
-from datetime import datetime
 from pathlib import Path
+from datetime import datetime, timezone
 from typing import Any, Dict
 
-# Nos aseguramos de que datetime tenga UTC por si acaso
-if not hasattr(datetime, "UTC"):
-    datetime.UTC = datetime.timezone.utc
+_logger_instance = None
 
-class RAGLogger:
-    def __init__(self, outputs_dir: Path):
-        self.logs_dir = outputs_dir / "logs"
-        self.logs_dir.mkdir(parents=True, exist_ok=True)
+class CustomDatasetLogger:
+    def __init__(self, log_path: Path, jsonl_path: Path):
+        self.jsonl_path = jsonl_path
         
-        timestamp = datetime.now(datetime.UTC).strftime("%Y%m%d_%H%M%S")
-        self.log_file = self.logs_dir / f"run_{timestamp}.log"
+        self.logger = logging.getLogger("RAG_Dataset")
+        self.logger.setLevel(logging.INFO)
+        self.logger.propagate = False
         
-        # Escribimos un evento de inicio
-        self.log_event("system_start", {"timestamp": timestamp})
-        print(f"[Logger] Inicializado: {self.log_file}")
+        # Prevent handler duplication in persistent sessions
+        if not self.logger.handlers:
+            file_handler = logging.FileHandler(log_path, encoding="utf-8")
+            formatter = logging.Formatter('%(asctime)s - [%(levelname)s] - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+            file_handler.setFormatter(formatter)
+            self.logger.addHandler(file_handler)
 
-    def log_event(self, event_type: str, data: Dict[str, Any]):
-        """Escribe un evento en formato JSONL."""
-        log_entry = {
-            "timestamp": datetime.now(datetime.UTC).isoformat(),
+    def log_event(self, node_name: str, event_type: str, data: Dict[str, Any]):
+        """Persists the event to both plain text (.log) and structured (.jsonl) formats."""
+        timestamp = datetime.now(timezone.utc).isoformat()
+        
+        # 1. Plain text (.log)
+        log_message = f"NODE: {node_name} | EVENT: {event_type} | DATA: {json.dumps(data, ensure_ascii=False)}"
+        self.logger.info(log_message)
+        
+        # 2. Structured (.jsonl) for ML fine-tuning
+        jsonl_record = {
+            "timestamp": timestamp,
+            "node": node_name,
             "event": event_type,
             "data": data
         }
-        
-        with open(self.log_file, "a", encoding="utf-8") as f:
-            # json.dumps asegura que se escriba en una sola línea (JSONL)
-            f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
+        with open(self.jsonl_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(jsonl_record, ensure_ascii=False) + "\n")
 
-    def log_node_start(self, node_name: str, state: Dict[str, Any]):
-        self.log_event(f"node_start_{node_name}", state)
+def init_logger(output_dir: Path):
+    global _logger_instance
+    log_path = output_dir / "dataset_training.log"
+    jsonl_path = output_dir / "dataset_training.jsonl"
+    _logger_instance = CustomDatasetLogger(log_path, jsonl_path)
 
-    def log_node_end(self, node_name: str, state_update: Dict[str, Any]):
-        self.log_event(f"node_end_{node_name}", state_update)
-
-    def log_llm_interaction(self, prompt: str, raw_response: str, parsed_response: Any = None):
-        self.log_event("llm_interaction", {
-            "prompt": prompt,
-            "raw_response": raw_response,
-            "parsed_response": parsed_response
-        })
-
-# Instancia global que inicializaremos desde main.py
-_logger = None
-
-def init_logger(outputs_dir: Path) -> RAGLogger:
-    global _logger
-    _logger = RAGLogger(outputs_dir)
-    return _logger
-
-def get_logger() -> RAGLogger:
-    global _logger
-    if _logger is None:
-        raise ValueError("El logger no ha sido inicializado. Llama a init_logger() primero.")
-    return _logger
+def get_logger() -> CustomDatasetLogger:
+    if _logger_instance is None:
+        raise ValueError("Logger no inicializado. Llama a init_logger() primero.")
+    return _logger_instance

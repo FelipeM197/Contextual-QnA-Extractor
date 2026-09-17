@@ -9,18 +9,17 @@ from raghilda.embedding import EmbeddingSentenceTransformers
 from raghilda.read import read_as_markdown
 from raghilda.store import DuckDBStore
 
-def configurar_entorno():
-    """Redirige caches y pesos de modelos únicamente si existe la partición D: en Windows."""
-    if sys.platform == "win32" and Path("D:/").exists():
-        ollama_models_dir = Path(r"d:\Ollama_Modelos")
-        hf_cache_dir = Path(r"d:\labADA\huggingface_cache")
-        ollama_models_dir.mkdir(parents=True, exist_ok=True)
-        hf_cache_dir.mkdir(parents=True, exist_ok=True)
-        os.environ["OLLAMA_MODELS"] = str(ollama_models_dir)
-        os.environ["HF_HOME"] = str(hf_cache_dir)
-        print(f"[Utils] Entorno Windows configurado. OLLAMA_MODELS={ollama_models_dir}")
-    else:
-        print("[Utils] Entorno Linux/macOS configurado con rutas por defecto.")
+def configurar_entorno(settings=None):
+    """Configura caches usando rutas portables y sobrescribibles por entorno."""
+    if settings is None:
+        from config import load_settings
+        settings = load_settings()
+
+    settings.ollama_models_dir.mkdir(parents=True, exist_ok=True)
+    settings.hf_home_dir.mkdir(parents=True, exist_ok=True)
+    os.environ.setdefault("OLLAMA_MODELS", str(settings.ollama_models_dir))
+    os.environ.setdefault("HF_HOME", str(settings.hf_home_dir))
+    print(f"[Utils] OLLAMA_MODELS={os.environ['OLLAMA_MODELS']}")
 
 def convertir_a_markdown(source_path: Path, target_path: Path) -> Path:
     """Convierte el documento origen a Markdown de forma idempotente."""

@@ -1,0 +1,1 @@
+La fotosíntesis es el proceso bioquímico mediante el cual las plantas, algas y ciertas bacterias transforman la energía de la luz solar en energía química estable. Durante este fenómeno, el dióxido de carbono y el agua se convierten en glucosa y oxígeno molecular en el interior de los cloroplastos, gracias a la acción del pigmento verde denominado clorofila.
